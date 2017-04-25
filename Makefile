@@ -1,4 +1,4 @@
-CXX      := /c/Users/arvidjoa/RubyDevKit/mingw/bin/g++
+CXX      := g++
 CC       := $(CXX)
 CXXFLAGS := -W -Wall --static -O2
 
