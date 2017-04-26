@@ -598,13 +598,21 @@ int main(int argc, char* argv[])
             }
             else if (flag == 'e')
             {
+                bool isRestrictedTotal = (totalReport == RESTRICTED_TOTAL);
+                for (int iii = 1; !isRestrictedTotal && iii < argc; ++iii)
+                    if (argv[iii][0] == '-' && argv[iii][1] == 't')
+                        isRestrictedTotal = true;
                 string extension = argv[++i];
                 findFiles(".", extension, excludes, foundFiles);
                 for (size_t ii = 0; ii < foundFiles.size(); ++ii)
                 {
-                    totalString += readFileIntoString(foundFiles[ii]);
-                    fileRecords.push_back(FileRecord(foundFiles[ii].c_str(),
-                                                     totalString.length()));
+                    if (!isRestrictedTotal ||
+                        foundFiles[ii].find("test") == string::npos)
+                    {
+                        totalString += readFileIntoString(foundFiles[ii]);
+                        fileRecords.push_back(FileRecord(foundFiles[ii].c_str(),
+                                                         totalString.length()));
+                    }
                 }
             }
             else if (flag == 'v')
