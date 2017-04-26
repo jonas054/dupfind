@@ -1,0 +1,15 @@
+offense_count_formatter.rb:39:Duplication 1 (1st instance, 235 characters, 14 lines).
+worst_offenders_formatter.rb:44:Duplication 1 (2nd instance).
+
+worst_offenders_formatter.rb:29:Duplication 2 (1st instance, 103 characters, 6 lines).
+offense_count_formatter.rb:24:Duplication 2 (2nd instance).
+
+worst_offenders_formatter.rb:17:Duplication 3 (1st instance, 71 characters, 4 lines).
+offense_count_formatter.rb:15:Duplication 3 (2nd instance).
+
+worst_offenders_formatter.rb:42:Duplication 4 (1st instance, 65 characters, 2 lines).
+offense_count_formatter.rb:37:Duplication 4 (2nd instance).
+
+worst_offenders_formatter.rb:37:Duplication 5 (1st instance, 62 characters, 3 lines).
+offense_count_formatter.rb:32:Duplication 5 (2nd instance).
+
