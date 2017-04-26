@@ -1,0 +1,3 @@
+./offense_count_formatter.rb:39:Duplication 1 (1st instance, 235 characters, 14 lines).
+./worst_offenders_formatter.rb:44:Duplication 1 (2nd instance).
+

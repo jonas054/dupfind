@@ -1,0 +1,63 @@
+./offense_count_formatter.rb:39:Duplication 1 (1st instance, 235 characters, 14 lines).
+./worst_offenders_formatter.rb:44:Duplication 1 (2nd instance).
+        end
+        output.puts '--'
+        output.puts "#{total_count}  Total"
+
+        output.puts
+      end
+
+      def ordered_offense_counts(offense_counts)
+        Hash[offense_counts.sort_by { |k, v| [-v, k] }]
+      end
+
+      def total_offense_count(offense_counts)
+        offense_counts.values.inject(0, :+)
+      end
+    end
+  end
+end
+
+./test_formatter.rb:43:Duplication 2 (1st instance, 106 characters, 10 lines).
+./simple_text_formatter.rb:65:Duplication 2 (2nd instance).
+      end
+
+      def smart_path(path)
+        # Ideally, we calculate this relative to the project root.
+        base_dir = Dir.pwd
+
+        if path.start_with? base_dir
+          relative_path(path, base_dir)
+        else
+          path
+        end
+      end
+
+./worst_offenders_formatter.rb:29:Duplication 3 (1st instance, 103 characters, 6 lines).
+./offense_count_formatter.rb:24:Duplication 3 (2nd instance).
+      end
+
+      def finished(_inspected_files)
+        report_summary(@offense_counts)
+      end
+
+      def report_summary(offense_counts)
+        per_
+
+./worst_offenders_formatter.rb:17:Duplication 4 (1st instance, 71 characters, 4 lines).
+./offense_count_formatter.rb:15:Duplication 4 (2nd instance).
+      attr_reader :offense_counts
+
+      def started(target_files)
+        super
+        @offense_counts =
+
+./simple_text_formatter.rb:4:Duplication 5 (1st instance, 69 characters, 4 lines).
+./html_formatter.rb:7:Duplication 5 (2nd instance).
+require 'rubocop/formatter/text_util'
+
+module RuboCop
+  module Formatter
+    # This formatter saves the output as an html file.
+    class
+

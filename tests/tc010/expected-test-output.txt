@@ -13,3 +13,12 @@
 ./simple_text_formatter.rb:4:Duplication 5 (1st instance, 69 characters, 4 lines).
 ./html_formatter.rb:7:Duplication 5 (2nd instance).
 
+./worst_offenders_formatter.rb:42:Duplication 6 (1st instance, 65 characters, 2 lines).
+./offense_count_formatter.rb:37:Duplication 6 (2nd instance).
+
+./worst_offenders_formatter.rb:37:Duplication 7 (1st instance, 62 characters, 3 lines).
+./offense_count_formatter.rb:32:Duplication 7 (2nd instance).
+
+./progress_formatter.rb:47:Duplication 8 (1st instance, 62 characters, 4 lines).
+./simple_text_formatter.rb:36:Duplication 8 (2nd instance).
+

@@ -21,11 +21,28 @@ README.md: dupfind
 	echo "\`\`\`" >> $@
 	rm help.txt
 
+# Help
 TC_001_CMD := dupfind -h
+# Files ending with
 TC_002_CMD := dupfind -e .rb
+# Name files on command line
 TC_003_CMD := dupfind offense_count_formatter.rb worst_offenders_formatter.rb
+# Total
 TC_004_CMD := dupfind -e .rb -t
+# Total including test files
 TC_005_CMD := dupfind -e .rb -T
+# Verbose
+TC_006_CMD := dupfind -e .rb -v
+# Exclude
+TC_007_CMD := dupfind -x offense_count -e .rb
+# Word mode
+TC_008_CMD := dupfind -w -e .rb
+# Minimum length
+TC_009_CMD := dupfind -m200 -e .rb
+# Count
+TC_010_CMD := dupfind -8 -e .rb
+# Proximity
+TC_011_CMD := dupfind -p15 -e .rb
 
 test: dupfind
 	@echo TC 001: $(TC_001_CMD)
@@ -43,4 +60,22 @@ test: dupfind
 	@echo TC 005: $(TC_005_CMD)
 	@cd tests/data && ../../$(TC_005_CMD) > ../tc005/test-output.txt
 	@diff tests/tc005/expected-test-output.txt tests/tc005/test-output.txt
+	@echo TC 006: $(TC_006_CMD)
+	@cd tests/data && ../../$(TC_006_CMD) > ../tc006/test-output.txt
+	@diff tests/tc006/expected-test-output.txt tests/tc006/test-output.txt
+	@echo TC 007: $(TC_007_CMD)
+	@cd tests/data && ../../$(TC_007_CMD) > ../tc007/test-output.txt
+	@diff tests/tc007/expected-test-output.txt tests/tc007/test-output.txt
+	@echo TC 008: $(TC_008_CMD)
+	@cd tests/data && ../../$(TC_008_CMD) > ../tc008/test-output.txt
+	@diff tests/tc008/expected-test-output.txt tests/tc008/test-output.txt
+	@echo TC 009: $(TC_009_CMD)
+	@cd tests/data && ../../$(TC_009_CMD) > ../tc009/test-output.txt
+	@diff tests/tc009/expected-test-output.txt tests/tc009/test-output.txt
+	@echo TC 010: $(TC_010_CMD)
+	@cd tests/data && ../../$(TC_010_CMD) > ../tc010/test-output.txt
+	@diff tests/tc010/expected-test-output.txt tests/tc010/test-output.txt
+	@echo TC 011: $(TC_011_CMD)
+	@cd tests/data && ../../$(TC_011_CMD) > ../tc011/test-output.txt
+	@diff tests/tc011/expected-test-output.txt tests/tc011/test-output.txt
 	@echo OK
