@@ -18,7 +18,7 @@ $(PROGRAM): dupfind.cc
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
-	rm -f *.o *.exe
+	rm -f *.o *.exe dupfind
 
 README.md: $(PROGRAM)
 	./$(PROGRAM) -h 2>&1 | $(DOS2UNIX) > help.txt
