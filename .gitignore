@@ -27,4 +27,7 @@
 *.exe
 *.out
 *.app
+dupfind
+
+# Generated test data
 test-output.txt
