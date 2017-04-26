@@ -168,9 +168,7 @@ private:
 
     enum DetailType { PRINT_LINES, COUNT_LINES };
 
-    int details(int         aProcessedLength,
-                DetailType  aType,
-                bool        wordMode)
+    int details(int aProcessedLength, DetailType  aType, bool wordMode)
     {
         const char* orig = totalString.c_str() + this->original;
         if (not wordMode)
@@ -197,9 +195,9 @@ private:
                 }
                 else if (not isspace(*orig))
                     blankLine = false;
-                // In word mode, a space in the processed text means any
-                // kind of space, so we can not continue to search for an
-                // exact match.
+                // In word mode, a space in the processed text means any kind
+                // of space, so we can not continue to search for an exact
+                // match.
                 if (*orig == this->processed[pi] ||
                     (isspace(this->processed[pi]) && isspace(*orig)))
                 {
@@ -221,17 +219,13 @@ private:
         else                                               return "th";
     }
 
-    static int lineNr(const char* aBase,
-                      int         anOffset,
-                      int         anIndex)
+    static int lineNr(const char* aBase, int anOffset, int anIndex)
     {
         const int start = (anIndex == 0) ? 0 : fileRecords[anIndex - 1].endIx;
         int result = 1;
         for (int i = start; i < anOffset; ++i)
-        {
             if (aBase[i] == '\n')
                 ++result;
-        }
         return result;
     }
 
