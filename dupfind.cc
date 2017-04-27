@@ -243,7 +243,7 @@ std::ostream& operator<<(std::ostream& os, const Bookmark& b)
  *---------------------------------------------------------------------------*/
 
 static void findFiles(const string&         name,
-                      const string&         extension,
+                      const string&         ending,
                       const vector<string>& excludes,
                       vector<string>&       output)
 {
@@ -264,12 +264,12 @@ static void findFiles(const string&         name,
                 toBeExcluded = true;
         if (toBeExcluded)
             continue;
-        if (path.length() > extension.length() &&
-            path.substr(path.length() - extension.length()) == extension)
+        if (path.length() > ending.length() &&
+            path.substr(path.length() - ending.length()) == ending)
         {
             output.push_back(path);
         }
-        findFiles(path, extension, excludes, output);
+        findFiles(path, ending, excludes, output);
     }
     closedir(dir);
 }
@@ -577,13 +577,10 @@ public:
                                      wordMode(false)
     {
         for (int i = 1; i < argc; ++i)
-        {
-            const char* arg = argv[i];
-            if (arg[0] == '-')
+            if (argv[i][0] == '-')
                 i = processFlag(i, argc, argv);
             else
-                processFileName(arg);
-        }
+                processFileName(argv[i]);
     }
 
 private:
@@ -592,73 +589,71 @@ private:
         const char* arg = argv[i];
         char flag = arg[1];
 
-        if (tolower(flag) == 't')
+        if (isdigit(flag))
         {
+            nrOfWantedReports = -atoi(arg);
+            return i;
+        }
+
+        switch (flag)
+        {
+        case 't':
+        case 'T':
             totalReport =
                 (flag == 't') ? RESTRICTED_TOTAL : UNRESTRICTED_TOTAL;
 
             nrOfWantedReports = INT_MAX;
             minLength         = 100;
             proximityFactor   = 100;
-        }
-        else if (isdigit(flag))
-            nrOfWantedReports = -atoi(arg);
-        else
-        {
-            switch (flag)
+            break;
+        case 'e': {
+            bool isRestrictedTotal = (totalReport == RESTRICTED_TOTAL);
+            for (int k = 1; !isRestrictedTotal && k < argc; ++k)
+                if (argv[k][0] == '-' && argv[k][1] == 't')
+                    isRestrictedTotal = true;
+            findFiles(".", argv[++i], excludes, foundFiles);
+            for (size_t ii = 0; ii < foundFiles.size(); ++ii)
             {
-            case 'e': {
-                bool isRestrictedTotal = (totalReport == RESTRICTED_TOTAL);
-                for (int k = 1; !isRestrictedTotal && k < argc; ++k)
-                    if (argv[k][0] == '-' && argv[k][1] == 't')
-                        isRestrictedTotal = true;
-                string extension = argv[++i];
-                findFiles(".", extension, excludes, foundFiles);
-                for (size_t ii = 0; ii < foundFiles.size(); ++ii)
+                if (!isRestrictedTotal ||
+                    foundFiles[ii].find("test") == string::npos)
                 {
-                    if (!isRestrictedTotal ||
-                        foundFiles[ii].find("test") == string::npos)
-                    {
-                        totalString +=
-                            readFileIntoString(foundFiles[ii]);
-                        FileRecord fr(foundFiles[ii].c_str(),
-                                      totalString.length());
-                        fileRecords.push_back(fr);
-                    }
+                    totalString += readFileIntoString(foundFiles[ii]);
+                    fileRecords.push_back(FileRecord(foundFiles[ii].c_str(),
+                                                     totalString.length()));
                 }
-                break;
             }
-            case 'v':
-                isVerbose = true;
-                break;
-            case 'x':
-                excludes.push_back(argv[++i]);
-                break;
-            case 'w':
-                wordMode = true;
-                break;
-            case 'm':
-                if (arg[2] == '\0')
-                    printUsageAndExit(HIDE_EXT_FLAGS, EXIT_FAILURE);
+            break;
+        }
+        case 'v':
+            isVerbose = true;
+            break;
+        case 'x':
+            excludes.push_back(argv[++i]);
+            break;
+        case 'w':
+            wordMode = true;
+            break;
+        case 'm':
+            if (arg[2] == '\0')
+                printUsageAndExit(HIDE_EXT_FLAGS, EXIT_FAILURE);
 
-                nrOfWantedReports = INT_MAX;
-                minLength         = atoi(&arg[2]);
-                break;
-            case 'p':
-                if (arg[2] == '\0')
-                    printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
+            nrOfWantedReports = INT_MAX;
+            minLength         = atoi(&arg[2]);
+            break;
+        case 'p':
+            if (arg[2] == '\0')
+                printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
 
-                proximityFactor = atoi(&arg[2]);
-                if (proximityFactor < 1 || proximityFactor > 100)
-                {
-                    cerr << "Proximity factor must be between 1 and "
-                         << "100 (inclusive)." << endl;
-                    printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
-                }
-                break;
-            default:
+            proximityFactor = atoi(&arg[2]);
+            if (proximityFactor < 1 || proximityFactor > 100)
+            {
+                cerr << "Proximity factor must be between 1 and 100 "
+                     << "(inclusive)." << endl;
                 printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
             }
+            break;
+        default:
+            printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
         }
         return i;
     }
@@ -670,15 +665,14 @@ private:
              (string(arg).find("_R") != string::npos &&
               isdigit(arg[string(arg).find("_R") + 2]))))
         {
-            cerr << "The file " << arg << " is not included in the "
-                 << "total duplication calculations. Use -T if you "
-                 << "want to include it." << endl;
+            cerr << "The file " << arg << " is not included in the total "
+                 << "duplication calculations. Use -T if you want to include "
+                 << "it." << endl;
         }
         else
         {
             totalString += readFileIntoString(arg);
-            fileRecords.push_back(FileRecord(arg,
-                                             totalString.length()));
+            fileRecords.push_back(FileRecord(arg, totalString.length()));
         }
     }
 };
@@ -734,9 +728,8 @@ int main(int argc, char* argv[])
         if (longestSame < options.minLength) // Exit loop if the common
             break;                           // substring is too short.
 
-        int instances           = 2;
-        int almostLongest       = (longestSame *
-                                   options.proximityFactor) / 100;
+        int instances = 2;
+        int almostLongest = (longestSame * options.proximityFactor) / 100;
         int origIndexForLongest = indexOf1stInstance;
 
         // Look for approximate matches in strings just before the current
