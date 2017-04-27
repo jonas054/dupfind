@@ -1,8 +1,3 @@
-#if 0
-head -n 3 $0 | tail -n 1
-/c/Users/arvidjoa/RubyDevKit/mingw/bin/g++ -W -Wall --static -O2 -o dupfind dupfind.cc
-exit
-#endif
 //=============================================================================
 //
 // File: dupfind.cc
