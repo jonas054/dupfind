@@ -612,6 +612,7 @@ private:
                 if (argv[k][0] == '-' && argv[k][1] == 't')
                     isRestrictedTotal = true;
             findFiles(".", argv[++i], excludes, foundFiles);
+            std::sort(foundFiles.begin(), foundFiles.end());
             for (size_t ii = 0; ii < foundFiles.size(); ++ii)
             {
                 if (!isRestrictedTotal ||
