@@ -80,8 +80,8 @@ public:
             ++count;
 
         cout << *this
-             << ":Duplication " << count << " (" << anInstanceNr << order(anInstanceNr)
-             << " instance";
+             << ":Duplication " << count << " (" << anInstanceNr
+             << order(anInstanceNr) << " instance";
         if (anInstanceNr == 1)
         {
             int nrOfLines = details(aNrOfSame, COUNT_LINES, wordMode);
@@ -498,9 +498,11 @@ static void printUsageAndExit(ExtFlagMode anExtFlagMode, int anExitCode)
          << "       dupfind [-v] [-w] [-<n>|-m<n>] "
          << (anExtFlagMode == SHOW_EXT_FLAGS ? "[-p<n>] " : "") << "<files>\n"
          << "       dupfind -t"
-         << (anExtFlagMode == SHOW_EXT_FLAGS ? "|-T" : "") << " [-v] [-w] <files>\n"
+         << (anExtFlagMode == SHOW_EXT_FLAGS ? "|-T" : "")
+         << " [-v] [-w] <files>\n"
          << "       -v:    verbose, print strings that are duplicated\n"
-         << "       -w:    calculate duplication based on words rather than lines\n"
+         << "       -w:    calculate duplication based on words rather than "
+         << "lines\n"
          << "       -10:   report the 10 longest duplications instead of 5,"
          << " which is default\n"
          << "       -m300: report all duplications that are at least 300"
@@ -554,120 +556,135 @@ static void getRidOfHoles()
     }
 }
 
+class Options
+{
+public:
+    enum TotalReport { NO_TOTAL, RESTRICTED_TOTAL, UNRESTRICTED_TOTAL };
+
+    Options(int argc, char* argv[]): nrOfWantedReports(5),
+                                           isVerbose(false),
+                                           totalReport(NO_TOTAL),
+                                           minLength(10),
+                                           proximityFactor(90),
+                                           wordMode(false)
+    {
+        for (int i = 1; i < argc; ++i)
+        {
+            const char* arg = argv[i];
+            if (arg[0] == '-')
+            {
+                char flag = arg[1];
+                if (tolower(flag) == 't')
+                {
+                    totalReport =
+                        (flag == 't') ? RESTRICTED_TOTAL : UNRESTRICTED_TOTAL;
+
+                    nrOfWantedReports = INT_MAX;
+                    minLength         = 100;
+                    proximityFactor   = 100;
+                }
+                else if (flag == 'e')
+                {
+                    bool isRestrictedTotal = (totalReport == RESTRICTED_TOTAL);
+                    for (int iii = 1; !isRestrictedTotal && iii < argc; ++iii)
+                        if (argv[iii][0] == '-' && argv[iii][1] == 't')
+                            isRestrictedTotal = true;
+                    string extension = argv[++i];
+                    findFiles(".", extension, excludes, foundFiles);
+                    for (size_t ii = 0; ii < foundFiles.size(); ++ii)
+                    {
+                        if (!isRestrictedTotal ||
+                            foundFiles[ii].find("test") == string::npos)
+                        {
+                            totalString += readFileIntoString(foundFiles[ii]);
+                            FileRecord fr(foundFiles[ii].c_str(),
+                                          totalString.length());
+                            fileRecords.push_back(fr);
+                        }
+                    }
+                }
+                else if (flag == 'v')
+                    isVerbose = true;
+                else if (flag == 'x')
+                {
+                    excludes.push_back(argv[++i]);
+                }
+                else if (flag == 'w')
+                    wordMode = true;
+                else if (isdigit(flag))
+                    nrOfWantedReports = -atoi(arg);
+                else if (flag == 'm')
+                {
+                    if (arg[2] == '\0')
+                        printUsageAndExit(HIDE_EXT_FLAGS, EXIT_FAILURE);
+
+                    nrOfWantedReports = INT_MAX;
+                    minLength         = atoi(&arg[2]);
+                }
+                else if (flag == 'p')
+                {
+                    if (arg[2] == '\0')
+                        printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
+
+                    proximityFactor = atoi(&arg[2]);
+                    if (proximityFactor < 1 || proximityFactor > 100)
+                    {
+                        cerr << "Proximity factor must be between 1 and 100 "
+                             << "(inclusive)." << endl;
+                        printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
+                    }
+                }
+                else
+                    printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
+            }
+            else
+            {
+                if (totalReport == RESTRICTED_TOTAL &&
+                    (string(arg).find("test") != string::npos ||
+                     (string(arg).find("_R") != string::npos &&
+                      isdigit(arg[string(arg).find("_R") + 2]))))
+                {
+                    cerr << "The file " << arg << " is not included in the "
+                         << "total duplication calculations. Use -T if you "
+                         << "want to include it." << endl;
+                }
+                else
+                {
+                    totalString += readFileIntoString(arg);
+                    fileRecords.push_back(FileRecord(arg,
+                                                     totalString.length()));
+                }
+            }
+        }
+    }
+
+    int            nrOfWantedReports;
+    bool           isVerbose;
+    TotalReport    totalReport;
+    int            minLength;
+    int            proximityFactor;
+    bool           wordMode;
+    vector<string> foundFiles;
+    vector<string> excludes;
+};
+
 /*-----------------------------------------------------------------------------
  * Main
  *---------------------------------------------------------------------------*/
 
 int main(int argc, char* argv[])
 {
-    enum TotalReport { NO_TOTAL, RESTRICTED_TOTAL, UNRESTRICTED_TOTAL };
-
     if (argc == 1)
         printUsageAndExit(HIDE_EXT_FLAGS, EXIT_SUCCESS);
 
-    int            nrOfWantedReports = 5;
-    bool           isVerbose         = false;
-    TotalReport    totalReport       = NO_TOTAL;
-    int            minLength         = 10;
-    int            proximityFactor   = 90;
-    int            startArg          = 1;
-    bool           wordMode          = false;
-    vector<string> foundFiles;
-    vector<string> excludes;
+    Options options(argc, argv);
 
-    for (int i = startArg; i < argc; ++i)
-    {
-        const char* arg = argv[i];
-        if (arg[0] == '-')
-        {
-            char flag = arg[1];
-            if (tolower(flag) == 't')
-            {
-                totalReport =
-                    (flag == 't') ? RESTRICTED_TOTAL : UNRESTRICTED_TOTAL;
-
-                nrOfWantedReports = INT_MAX;
-                minLength         = 100;
-                startArg          = 2;
-                proximityFactor   = 100;
-            }
-            else if (flag == 'e')
-            {
-                bool isRestrictedTotal = (totalReport == RESTRICTED_TOTAL);
-                for (int iii = 1; !isRestrictedTotal && iii < argc; ++iii)
-                    if (argv[iii][0] == '-' && argv[iii][1] == 't')
-                        isRestrictedTotal = true;
-                string extension = argv[++i];
-                findFiles(".", extension, excludes, foundFiles);
-                for (size_t ii = 0; ii < foundFiles.size(); ++ii)
-                {
-                    if (!isRestrictedTotal ||
-                        foundFiles[ii].find("test") == string::npos)
-                    {
-                        totalString += readFileIntoString(foundFiles[ii]);
-                        fileRecords.push_back(FileRecord(foundFiles[ii].c_str(),
-                                                         totalString.length()));
-                    }
-                }
-            }
-            else if (flag == 'v')
-                isVerbose = true;
-            else if (flag == 'x')
-            {
-                excludes.push_back(argv[++i]);
-            }
-            else if (flag == 'w')
-                wordMode = true;
-            else if (isdigit(flag))
-                nrOfWantedReports = -atoi(arg);
-            else if (flag == 'm')
-            {
-                if (arg[2] == '\0')
-                    printUsageAndExit(HIDE_EXT_FLAGS, EXIT_FAILURE);
-
-                nrOfWantedReports = INT_MAX;
-                minLength         = atoi(&arg[2]);
-            }
-            else if (flag == 'p')
-            {
-                if (arg[2] == '\0')
-                    printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
-
-                proximityFactor = atoi(&arg[2]);
-                if (proximityFactor < 1 || proximityFactor > 100)
-                {
-                    cerr << "Proximity factor must be between 1 and 100 "
-                         << "(inclusive)." << endl;
-                    printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
-                }
-            }
-            else
-                printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
-        }
-        else
-        {
-            if (totalReport == RESTRICTED_TOTAL &&
-                (string(arg).find("test") != string::npos ||
-                 (string(arg).find("_R") != string::npos &&
-                  isdigit(arg[string(arg).find("_R") + 2]))))
-            {
-                cerr << "The file " << arg << " is not included in the "
-                     << "total duplication calculations. Use -T if you want "
-                     << "to include it." << endl;
-            }
-            else
-            {
-                totalString += readFileIntoString(arg);
-                fileRecords.push_back(FileRecord(arg, totalString.length()));
-            }
-        }
-    }
     if (totalString.length() == 0)
         printUsageAndExit(HIDE_EXT_FLAGS, EXIT_FAILURE);
 
     fileRecords.push_back(FileRecord(0, 0)); // Mark end
 
-    const char* processed        = process(wordMode);
+    const char* processed        = process(options.wordMode);
     const char* processedEnd     = processed + strlen(processed);
     int         totalDuplication = 0;
 
@@ -675,7 +692,7 @@ int main(int argc, char* argv[])
     // than std::sort() in this context.
     std::stable_sort(bookmarks.begin(), bookmarks.end());
 
-    for (int count = 0; count < nrOfWantedReports; ++count)
+    for (int count = 0; count < options.nrOfWantedReports; ++count)
     {
         int longestSame        = 0;
         int indexOf1stInstance = 0;
@@ -699,11 +716,11 @@ int main(int argc, char* argv[])
             }
         }
 
-        if (longestSame < minLength) // Exit loop if the common substring is
-            break;                   // too short.
+        if (longestSame < options.minLength) // Exit loop if the common
+            break;                           // substring is too short.
 
         int instances           = 2;
-        int almostLongest       = (longestSame * proximityFactor) / 100;
+        int almostLongest       = (longestSame * options.proximityFactor) / 100;
         int origIndexForLongest = indexOf1stInstance;
 
         // Look for approximate matches in strings just before the current
@@ -738,8 +755,9 @@ int main(int argc, char* argv[])
         for (int i = 0; i < instances; ++i)
         {
             bookmarks[indexOf1stInstance + i].
-                report(longestSame, i + 1, isVerbose && i == instances - 1,
-                       wordMode);
+                report(longestSame, i + 1,
+                       options.isVerbose && i == instances - 1,
+                       options.wordMode);
         }
         cout << endl;
 
@@ -750,9 +768,9 @@ int main(int argc, char* argv[])
         Bookmark::clearWithin(indexOf1stInstance, longestSame, instances);
 
         getRidOfHoles();
-    } // for (int count = 0; count < nrOfWantedReports; ++count)
+    } // for (int count = 0; count < options.nrOfWantedReports; ++count)
 
-    if (totalReport != NO_TOTAL)
+    if (options.totalReport != Options::NO_TOTAL)
     {
         const int length = processedEnd - processed;
         cout << "Duplication = " << totalNrOfLines << " lines, "
