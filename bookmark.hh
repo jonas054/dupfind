@@ -4,20 +4,17 @@
 #include <string>
 #include <vector>
 
-using std::string;
-using std::vector;
-
 extern const char SPECIAL_EOF;
-
-struct FileRecord
-{
-    FileRecord(const char* n, int i): fileName(n), endIx(i) {}
-    const char* fileName;
-    int         endIx; // Position right after the final char of the file.
-};
 
 class Bookmark
 {
+    struct FileRecord
+    {
+        FileRecord(const char* n, int i): fileName(n), endIx(i) {}
+        const char* fileName;
+        int         endIx; // Position right after the final char of the file.
+    };
+
 public:
     Bookmark(int i, const char* p);
 
@@ -28,7 +25,7 @@ public:
     void report(int aNrOfSame,
                 int anInstanceNr,
                 bool isVerbose_,
-                bool wordMode);
+                bool wordMode) const;
 
     void clear();
 
@@ -49,7 +46,7 @@ public:
 
     static void addFile(const char* fileName);
 
-    static void addText(const string& text);
+    static void addText(const std::string& text);
 
     static size_t totalLength();
 
@@ -61,18 +58,18 @@ private:
 
     enum DetailType { PRINT_LINES, COUNT_LINES };
 
-    static string readFileIntoString(const char* aFileName);
+    static std::string readFileIntoString(const char* aFileName);
 
-    int details(int aProcessedLength, DetailType  aType, bool wordMode);
+    int details(int aProcessedLength, DetailType  aType, bool wordMode) const;
 
     // Returns the correct suffix for strings like 1st, 2nd, 3rd, 4th, etc.
     static const char* order(int aNumber);
 
     static int lineNr(const char* aBase, int anOffset, int anIndex);
 
-    static int                totalNrOfLines;
-    static vector<FileRecord> fileRecords;
-    static string             totalString;
+    static int                     totalNrOfLines;
+    static std::vector<FileRecord> fileRecords;
+    static std::string             totalString;
 
     int         original;
     const char* processed;

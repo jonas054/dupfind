@@ -1,4 +1,6 @@
 #include <algorithm>  // stable_sort
+
+#include "bookmark.hh"
 #include "bookmark_container.hh"
 
 void BookmarkContainer::addBookmark(const Bookmark& bm)
@@ -7,19 +9,28 @@ void BookmarkContainer::addBookmark(const Bookmark& bm)
 }
 
 void BookmarkContainer::report(int i,
-                              int aNrOfSame,
-                              int anInstanceNr,
-                              bool isVerbose_,
-                              bool wordMode)
+                               int aNrOfSame,
+                               int anInstanceNr,
+                               bool isVerbose_,
+                               bool wordMode) const
 {
     bookmarks[i].report(aNrOfSame, anInstanceNr, isVerbose_, wordMode);
 }
 
-size_t BookmarkContainer::size() const { return bookmarks.size(); }
+size_t BookmarkContainer::size() const
+{
+    return bookmarks.size();
+}
 
-bool BookmarkContainer::isCleared(int i) const { return bookmarks[i].isCleared(); }
+bool BookmarkContainer::isCleared(int i) const
+{
+    return bookmarks[i].isCleared();
+}
 
-bool BookmarkContainer::same(int a, int b, int longestSame, const char* processedEnd)
+bool BookmarkContainer::same(int a,
+                             int b,
+                             int longestSame,
+                             const char* processedEnd) const
 {
     return bookmarks[a].sameAs(bookmarks[b], longestSame, processedEnd);
 }
@@ -37,8 +48,8 @@ void BookmarkContainer::sort()
 }
 
 void BookmarkContainer::clearWithin(int indexOf1stInstance,
-                                   int longestSame,
-                                   int instances)
+                                    int longestSame,
+                                    int instances)
 {
     for (int i = 0; i < instances; ++i)
     {
@@ -76,8 +87,8 @@ void BookmarkContainer::getRidOfHoles()
             if (source == bookmarks.size())
                 break;
 
-            // Now pointing to a null bookmark (dest) and a non-null bookmark
-            // (source). Swap them.
+            // Now pointing to a null bookmark (dest) and a non-null
+            // bookmark (source). Swap them.
             bookmarks[dest] = bookmarks[source];
             bookmarks[source].clear();
         }

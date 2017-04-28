@@ -14,6 +14,11 @@ default: $(PROGRAM)
 
 all: test README.md
 
+bookmark.o: bookmark.hh
+bookmark_container.o: bookmark_container.hh bookmark.hh
+options.o: options.hh
+dupfind.o: $(wildcard *.hh)
+
 $(PROGRAM): dupfind.o bookmark.o bookmark_container.o options.o
 	$(CXX) --static -o $@ $^
 

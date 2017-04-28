@@ -16,9 +16,9 @@ using std::istream_iterator;
 using std::string;
 using std::vector;
 
-int                Bookmark::totalNrOfLines = 0;
-vector<FileRecord> Bookmark::fileRecords;
-string             Bookmark::totalString;
+int                          Bookmark::totalNrOfLines = 0;
+vector<Bookmark::FileRecord> Bookmark::fileRecords;
+string                       Bookmark::totalString;
 
 Bookmark::Bookmark(int i, const char* p): original(i), processed(p) {}
 
@@ -29,7 +29,7 @@ Bookmark::Bookmark(int i, const char* p): original(i), processed(p) {}
 void Bookmark::report(int aNrOfSame,
                       int anInstanceNr,
                       bool isVerbose_,
-                      bool wordMode)
+                      bool wordMode) const
 {
     static int count = 0;
 
@@ -78,7 +78,8 @@ int Bookmark::nrOfSame(Bookmark b) const
  * find out quickly if the two strings are not equal in the given number of
  * characters and move on to the next comparison.
  */
-bool Bookmark::sameAs(Bookmark b, int aNrOfCharacters, const char* anEnd) const
+bool
+Bookmark::sameAs(Bookmark b, int aNrOfCharacters, const char* anEnd) const
 {
     if (&this->processed[aNrOfCharacters] >= anEnd ||
         &b.processed[aNrOfCharacters] >= anEnd)
@@ -139,7 +140,8 @@ string Bookmark::readFileIntoString(const char* aFileName)
     return string(vec.begin(), vec.end());
 }
 
-int Bookmark::details(int aProcessedLength, DetailType  aType, bool wordMode)
+int
+Bookmark::details(int aProcessedLength, DetailType  aType, bool wordMode) const
 {
     const char* orig = totalString.c_str() + this->original;
     if (not wordMode)

@@ -1,7 +1,9 @@
 #ifndef BOOKMARK_CONTAINER_HH
 #define BOOKMARK_CONTAINER_HH
 
-#include "bookmark.hh"
+#include <vector>
+
+class Bookmark;
 
 class BookmarkContainer
 {
@@ -12,13 +14,13 @@ public:
                 int aNrOfSame,
                 int anInstanceNr,
                 bool isVerbose_,
-                bool wordMode);
+                bool wordMode) const;
 
     size_t size() const;
 
     bool isCleared(int i) const;
 
-    bool same(int a, int b, int longestSame, const char* processedEnd);
+    bool same(int a, int b, int longestSame, const char* processedEnd) const;
 
     int nrOfSame(int a, int b) const;
 
@@ -29,14 +31,14 @@ public:
                      int instances);
 private:
     /**
-     * Removes all bookmarks where the "processed" field is null while maintaining
-     * a sorted bookmark array. It uses a "two index fingers" algorithm looking for
-     * null bookmarks with the left index finger (dest) and for non-null bookmarks
-     * with the right index finger (source).
+     * Removes all bookmarks where the "processed" field is null while
+     * maintaining a sorted bookmark array. It uses a "two index fingers"
+     * algorithm looking for null bookmarks with the left index finger (dest)
+     * and for non-null bookmarks with the right index finger (source).
      */
     void getRidOfHoles();
 
-    vector<Bookmark> bookmarks;
+    std::vector<Bookmark> bookmarks;
 };
 
 #endif
