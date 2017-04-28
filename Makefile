@@ -14,8 +14,8 @@ default: $(PROGRAM)
 
 all: test README.md
 
-$(PROGRAM): dupfind.o
-	$(CXX) --static -o $@ $<
+$(PROGRAM): dupfind.o bookmark.o bookmark_container.o
+	$(CXX) --static -o $@ $^
 
 clean:
 	rm -f *.o *.exe dupfind
