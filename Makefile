@@ -14,7 +14,7 @@ default: $(PROGRAM)
 
 all: test README.md
 
-$(PROGRAM): dupfind.o bookmark.o bookmark_container.o
+$(PROGRAM): dupfind.o bookmark.o bookmark_container.o options.o
 	$(CXX) --static -o $@ $^
 
 clean:
