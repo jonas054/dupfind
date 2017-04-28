@@ -16,6 +16,10 @@ using std::istream_iterator;
 using std::string;
 using std::vector;
 
+static const char* order(int aNumber);
+static string      readFileIntoString(const char* aFileName);
+
+
 int                          Bookmark::totalNrOfLines = 0;
 vector<Bookmark::FileRecord> Bookmark::fileRecords;
 string                       Bookmark::totalString;
@@ -50,6 +54,15 @@ void Bookmark::report(int aNrOfSame,
     cout << ")." << endl;
     if (isVerbose_)
         details(aNrOfSame, PRINT_LINES, wordMode);
+}
+
+// Returns the correct suffix for strings like 1st, 2nd, 3rd, 4th, etc.
+static const char* order(int aNumber)
+{
+    if      (aNumber % 10 == 1 && aNumber % 100 != 11) return "st";
+    else if (aNumber % 10 == 2 && aNumber % 100 != 12) return "nd";
+    else if (aNumber % 10 == 3 && aNumber % 100 != 13) return "rd";
+    else                                               return "th";
 }
 
 void Bookmark::clear() { this->processed = 0; }
@@ -99,18 +112,12 @@ int Bookmark::getTotalNrOfLines() { return totalNrOfLines; }
 void Bookmark::addFile(const char* fileName)
 {
     if (fileName)
-        addText(readFileIntoString(fileName));
+        totalString += readFileIntoString(fileName);
 
     fileRecords.push_back(FileRecord(fileName, totalString.length()));
 }
 
-void Bookmark::addText(const string& text) { totalString += text; }
-
-size_t Bookmark::totalLength() { return totalString.length(); }
-
-const char& Bookmark::getChar(int i) { return totalString[i]; }
-
-string Bookmark::readFileIntoString(const char* aFileName)
+static string readFileIntoString(const char* aFileName)
 {
     struct stat s;
     if ((stat(aFileName, &s) == 0) && (s.st_mode & S_IFDIR))
@@ -140,6 +147,10 @@ string Bookmark::readFileIntoString(const char* aFileName)
     return string(vec.begin(), vec.end());
 }
 
+size_t Bookmark::totalLength() { return totalString.length(); }
+
+const char& Bookmark::getChar(int i) { return totalString[i]; }
+
 int
 Bookmark::details(int aProcessedLength, DetailType  aType, bool wordMode) const
 {
@@ -168,9 +179,8 @@ Bookmark::details(int aProcessedLength, DetailType  aType, bool wordMode) const
             }
             else if (not isspace(*orig))
                 blankLine = false;
-            // In word mode, a space in the processed text means any kind
-            // of space, so we can not continue to search for an exact
-            // match.
+            // In word mode, a space in the processed text means any kind of
+            // space, so we can not continue to search for an exact match.
             if (*orig == this->processed[pi] ||
                 (isspace(this->processed[pi]) && isspace(*orig)))
             {
@@ -181,15 +191,6 @@ Bookmark::details(int aProcessedLength, DetailType  aType, bool wordMode) const
     if (aType == PRINT_LINES)
         cout << endl;
     return count;
-}
-
-// Returns the correct suffix for strings like 1st, 2nd, 3rd, 4th, etc.
-const char* Bookmark::order(int aNumber)
-{
-    if      (aNumber % 10 == 1 && aNumber % 100 != 11) return "st";
-    else if (aNumber % 10 == 2 && aNumber % 100 != 12) return "nd";
-    else if (aNumber % 10 == 3 && aNumber % 100 != 13) return "rd";
-    else                                               return "th";
 }
 
 int Bookmark::lineNr(const char* aBase, int anOffset, int anIndex)

@@ -46,8 +46,6 @@ public:
 
     static void addFile(const char* fileName);
 
-    static void addText(const std::string& text);
-
     static size_t totalLength();
 
     static const char& getChar(int i);
@@ -58,12 +56,7 @@ private:
 
     enum DetailType { PRINT_LINES, COUNT_LINES };
 
-    static std::string readFileIntoString(const char* aFileName);
-
     int details(int aProcessedLength, DetailType  aType, bool wordMode) const;
-
-    // Returns the correct suffix for strings like 1st, 2nd, 3rd, 4th, etc.
-    static const char* order(int aNumber);
 
     static int lineNr(const char* aBase, int anOffset, int anIndex);
 

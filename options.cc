@@ -1,21 +1,17 @@
 #include "options.hh"
 #include "bookmark.hh"
 
-#include <algorithm>  // stable_sort
-#include <fstream>    // ifstream
-#include <iostream>   // cout, cerr, endl, ostream
+#include <algorithm>  // sort
+#include <iostream>   // cerr, endl
 #include <cstring>    // strcmp, strncmp, strlen
 #include <climits>    // INT_MAX
 #include <sys/stat.h> // struct stat
-#include <map>
 #include <string>
 #include <vector>
 #include <dirent.h>   // DIR, opendir(), readdir(), closedir()
 
 using std::cerr;
-using std::cout;
 using std::endl;
-using std::map;
 using std::string;
 using std::vector;
 
@@ -36,7 +32,7 @@ Options::Options(int argc, char* argv[]): nrOfWantedReports(5),
 int Options::processFlag(int i, int argc, char* argv[])
 {
     const char* arg = argv[i];
-    char flag = arg[1];
+    const char flag = arg[1];
 
     if (isdigit(flag))
     {
@@ -95,8 +91,8 @@ int Options::processFlag(int i, int argc, char* argv[])
         proximityFactor = atoi(&arg[2]);
         if (proximityFactor < 1 || proximityFactor > 100)
         {
-            cerr << "Proximity factor must be between 1 and 100 "
-                 << "(inclusive)." << endl;
+            cerr << "Proximity factor must be between 1 and 100 (inclusive)."
+                 << endl;
             printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
         }
         break;
@@ -146,8 +142,8 @@ void Options::processFileName(const char* arg)
           isdigit(arg[string(arg).find("_R") + 2]))))
     {
         cerr << "The file " << arg << " is not included in the total "
-             << "duplication calculations. Use -T if you want to include "
-             << "it." << endl;
+             << "duplication calculations. Use -T if you want to include it."
+             << endl;
     }
     else
     {
@@ -172,22 +168,22 @@ void Options::printUsageAndExit(ExtFlagMode anExtFlagMode, int anExitCode)
          << " which is default\n"
          << "       -m300: report all duplications that are at least 300"
          << " characters long\n"
-         << "       -x:    exclude paths matching substring when searching"
-         << " for files with -e\n"
+         << "       -x:    exclude paths matching substring when searching for"
+         << " files with -e\n"
          << "              (-x must come before the -e option it applies to)\n"
-         << "       -e:    search recursively for files whose names end"
-         << " with the given ending\n"
+         << "       -e:    search recursively for files whose names end with"
+         << " the given ending\n"
          << "              (several -e options can be given)\n";
     if (anExtFlagMode == SHOW_EXT_FLAGS)
     {
-        cerr << "       -p50:  use 50% proximity (more but shorter "
-             << "matches); 90% is default\n";
+        cerr << "       -p50:  use 50% proximity (more but shorter matches); "
+             << "90% is default\n";
     }
     cerr << "       -t:    set -m100 and sum up the total duplication\n";
     if (anExtFlagMode == SHOW_EXT_FLAGS)
     {
-        cerr << "       -T:    same as -t but accept any file (test code"
-             << " etc.)\n";
+        cerr << "       -T:    same as -t but accept any file (test code etc.)"
+             << endl;
     }
     exit(anExitCode);
 }
