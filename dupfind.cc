@@ -47,7 +47,6 @@ class Bookmark;
  *---------------------------------------------------------------------------*/
 
 vector<Bookmark> bookmarks;
-string           totalString;
 
 /*-----------------------------------------------------------------------------
  * Types
@@ -158,13 +157,52 @@ public:
 
     static void addFile(const char* fileName)
     {
+        if (fileName)
+            addText(readFileIntoString(fileName));
+
         fileRecords.push_back(FileRecord(fileName, totalString.length()));
     }
+
+    static void addText(const string& text) { totalString += text; }
+
+    static size_t totalLength() { return totalString.length(); }
+
+    static const char& getChar(int i) { return totalString[i]; }
 
 private:
     friend std::ostream& operator<<(std::ostream& os, const Bookmark& b);
 
     enum DetailType { PRINT_LINES, COUNT_LINES };
+
+    static string readFileIntoString(const char* aFileName)
+    {
+        struct stat s;
+        if ((stat(aFileName, &s) == 0) && (s.st_mode & S_IFDIR))
+            {
+                cerr << "dupfind: " << aFileName << " is a directory.\n";
+                exit(EXIT_FAILURE);
+            }
+
+        std::ifstream in(aFileName, ios::in);
+        if (!in.good())
+            {
+                cerr << "dupfind: File " << aFileName << " not found.\n";
+                exit(EXIT_FAILURE);
+            }
+        in.unsetf(ios::skipws);
+        in.seekg(0, ios::end);
+        std::streampos fsize = in.tellg() + (std::streamoff)1;
+        in.seekg(0, ios::beg);
+
+        vector<char> vec;
+        vec.reserve(fsize);
+        copy(istream_iterator<char>(in), istream_iterator<char>(),
+             back_inserter(vec));
+
+        vec.push_back(SPECIAL_EOF);
+
+        return string(vec.begin(), vec.end());
+    }
 
     int details(int aProcessedLength, DetailType  aType, bool wordMode)
     {
@@ -229,13 +267,15 @@ private:
 
     static int                totalNrOfLines;
     static vector<FileRecord> fileRecords;
+    static string             totalString;
 
     int         original;
     const char* processed;
 };
 
-int Bookmark::totalNrOfLines = 0;
+int                Bookmark::totalNrOfLines = 0;
 vector<FileRecord> Bookmark::fileRecords;
+string             Bookmark::totalString;
 
 std::ostream& operator<<(std::ostream& os, const Bookmark& b)
 {
@@ -244,7 +284,7 @@ std::ostream& operator<<(std::ostream& os, const Bookmark& b)
         ++recIx;
 
     os << Bookmark::fileRecords[recIx].fileName << ":"
-       << Bookmark::lineNr(totalString.c_str(), b.original, recIx);
+       << Bookmark::lineNr(Bookmark::totalString.c_str(), b.original, recIx);
     return os;
 }
 
@@ -287,36 +327,6 @@ static void findFiles(const string&         name,
 inline void addBookmark(const Bookmark& bm)
 {
     bookmarks.push_back(bm);
-}
-
-static string readFileIntoString(string aFileName)
-{
-    struct stat s;
-    if ((stat(aFileName.c_str(), &s) == 0) && (s.st_mode & S_IFDIR))
-    {
-        cerr << "dupfind: " << aFileName << " is a directory.\n";
-        exit(EXIT_FAILURE);
-    }
-
-    std::ifstream in(aFileName.c_str(), ios::in);
-    if (!in.good())
-    {
-        cerr << "dupfind: File " << aFileName << " not found.\n";
-        exit(EXIT_FAILURE);
-    }
-    in.unsetf(ios::skipws);
-    in.seekg(0, ios::end);
-    std::streampos fsize = in.tellg() + (std::streamoff)1;
-    in.seekg(0, ios::beg);
-
-    vector<char> vec;
-    vec.reserve(fsize);
-    copy(istream_iterator<char>(in), istream_iterator<char>(),
-         back_inserter(vec));
-
-    vec.push_back(SPECIAL_EOF);
-
-    return string(vec.begin(), vec.end());
 }
 
 /**
@@ -426,12 +436,12 @@ static const char* process(bool wordMode)
     }
 
     State       state              = NORMAL;
-    char* const processed          = new char[totalString.length()];
+    char* const processed          = new char[Bookmark::totalLength()];
     bool        timeForNewBookmark = true;
 
-    for (size_t i = 0; i < totalString.length(); ++i)
+    for (size_t i = 0; i < Bookmark::totalLength(); ++i)
     {
-        const char c = totalString[i];
+        const char c = Bookmark::getChar(i);
 
         // Apparenly there can be zeroes in the total string, but only when
         // running on some machines. Don't know why.
@@ -478,8 +488,8 @@ static const char* process(bool wordMode)
             if (timeForNewBookmark && c != '}')
             {
                 if (c == '#' ||
-                    strncmp("import", &totalString[i], 6) == 0 ||
-                    strncmp("using",  &totalString[i], 5) == 0)
+                    strncmp("import", &Bookmark::getChar(i), 6) == 0 ||
+                    strncmp("using",  &Bookmark::getChar(i), 5) == 0)
                 {
                     state = SKIP_TO_EOL;
                 }
@@ -492,7 +502,7 @@ static const char* process(bool wordMode)
             timeForNewBookmark = false;
         }
     }
-    addChar('\0', totalString.length(), processed);
+    addChar('\0', Bookmark::totalLength(), processed);
 
     return processed;
 }
@@ -628,7 +638,6 @@ private:
                 if (!isRestrictedTotal ||
                     foundFiles[ii].find("test") == string::npos)
                 {
-                    totalString += readFileIntoString(foundFiles[ii]);
                     Bookmark::addFile(foundFiles[ii].c_str());
                 }
             }
@@ -681,7 +690,6 @@ private:
         }
         else
         {
-            totalString += readFileIntoString(arg);
             Bookmark::addFile(arg);
         }
     }
@@ -698,7 +706,7 @@ int main(int argc, char* argv[])
 
     Options options(argc, argv);
 
-    if (totalString.length() == 0)
+    if (Bookmark::totalLength() == 0)
         printUsageAndExit(HIDE_EXT_FLAGS, EXIT_FAILURE);
 
     Bookmark::addFile(0); // Mark end
