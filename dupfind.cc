@@ -46,7 +46,8 @@ class Bookmark;
  * Global variables
  *---------------------------------------------------------------------------*/
 
-static vector<Bookmark> bookmarks;
+vector<Bookmark> bookmarks;
+string           totalString;
 
 /*-----------------------------------------------------------------------------
  * Types
@@ -58,10 +59,6 @@ struct FileRecord
     const char* fileName;
     int         endIx; // Position right after the final char of the file.
 };
-
-vector<FileRecord> fileRecords;
-int                totalNrOfLines = 0;
-string             totalString    = "";
 
 class Bookmark
 {
@@ -157,6 +154,13 @@ public:
         }
     }
 
+    static int getTotalNrOfLines() { return totalNrOfLines; }
+
+    static void addFile(const char* fileName)
+    {
+        fileRecords.push_back(FileRecord(fileName, totalString.length()));
+    }
+
 private:
     friend std::ostream& operator<<(std::ostream& os, const Bookmark& b);
 
@@ -223,17 +227,23 @@ private:
         return result;
     }
 
+    static int                totalNrOfLines;
+    static vector<FileRecord> fileRecords;
+
     int         original;
     const char* processed;
 };
 
+int Bookmark::totalNrOfLines = 0;
+vector<FileRecord> Bookmark::fileRecords;
+
 std::ostream& operator<<(std::ostream& os, const Bookmark& b)
 {
     int recIx = 0;
-    while (fileRecords[recIx].endIx <= b.original)
+    while (Bookmark::fileRecords[recIx].endIx <= b.original)
         ++recIx;
 
-    os << fileRecords[recIx].fileName << ":"
+    os << Bookmark::fileRecords[recIx].fileName << ":"
        << Bookmark::lineNr(totalString.c_str(), b.original, recIx);
     return os;
 }
@@ -619,8 +629,7 @@ private:
                     foundFiles[ii].find("test") == string::npos)
                 {
                     totalString += readFileIntoString(foundFiles[ii]);
-                    fileRecords.push_back(FileRecord(foundFiles[ii].c_str(),
-                                                     totalString.length()));
+                    Bookmark::addFile(foundFiles[ii].c_str());
                 }
             }
             break;
@@ -673,7 +682,7 @@ private:
         else
         {
             totalString += readFileIntoString(arg);
-            fileRecords.push_back(FileRecord(arg, totalString.length()));
+            Bookmark::addFile(arg);
         }
     }
 };
@@ -692,7 +701,7 @@ int main(int argc, char* argv[])
     if (totalString.length() == 0)
         printUsageAndExit(HIDE_EXT_FLAGS, EXIT_FAILURE);
 
-    fileRecords.push_back(FileRecord(0, 0)); // Mark end
+    Bookmark::addFile(0); // Mark end
 
     const char* processed        = process(options.wordMode);
     const char* processedEnd     = processed + strlen(processed);
@@ -783,7 +792,7 @@ int main(int argc, char* argv[])
     if (options.totalReport != Options::NO_TOTAL)
     {
         const int length = processedEnd - processed;
-        cout << "Duplication = " << totalNrOfLines << " lines, "
+        cout << "Duplication = " << Bookmark::getTotalNrOfLines() << " lines, "
              << (100 * totalDuplication + length / 2) / length << " %\n";
     }
     delete [] processed;
