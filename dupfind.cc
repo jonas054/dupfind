@@ -37,18 +37,6 @@ using std::vector;
 static const char SPECIAL_EOF = '\x7';
 
 /*-----------------------------------------------------------------------------
- * Forward declarations
- *---------------------------------------------------------------------------*/
-
-class Bookmark;
-
-/*-----------------------------------------------------------------------------
- * Global variables
- *---------------------------------------------------------------------------*/
-
-vector<Bookmark> bookmarks;
-
-/*-----------------------------------------------------------------------------
  * Types
  *---------------------------------------------------------------------------*/
 
@@ -135,24 +123,6 @@ public:
         return true;
     }
 
-    static void clearWithin(int indexOf1stInstance,
-                            int longestSame,
-                            int instances)
-    {
-        for (int i = 0; i < instances; ++i)
-        {
-            const char* reportStart =
-                bookmarks[indexOf1stInstance + i].processed;
-
-            for (size_t ix = 0; ix < bookmarks.size() - 1; ++ix)
-                if (bookmarks[ix].processed >= reportStart &&
-                    bookmarks[ix].processed < reportStart + longestSame)
-                {
-                    bookmarks[ix].clear();
-                }
-        }
-    }
-
     static int getTotalNrOfLines() { return totalNrOfLines; }
 
     static void addFile(const char* fileName)
@@ -171,6 +141,7 @@ public:
 
 private:
     friend std::ostream& operator<<(std::ostream& os, const Bookmark& b);
+    friend class BookmarkContainer;
 
     enum DetailType { PRINT_LINES, COUNT_LINES };
 
@@ -288,6 +259,96 @@ std::ostream& operator<<(std::ostream& os, const Bookmark& b)
     return os;
 }
 
+class BookmarkContainer
+{
+public:
+    void addBookmark(const Bookmark& bm)
+    {
+        bookmarks.push_back(bm);
+    }
+
+    void report(int i,
+                int aNrOfSame,
+                int anInstanceNr,
+                bool isVerbose_,
+                bool wordMode)
+    {
+        bookmarks[i].report(aNrOfSame, anInstanceNr, isVerbose_, wordMode);
+    }
+
+    size_t size() const { return bookmarks.size(); }
+
+    bool isCleared(int i) const { return bookmarks[i].isCleared(); }
+
+    bool same(int a, int b, int longestSame, const char* processedEnd)
+    {
+        return bookmarks[a].sameAs(bookmarks[b], longestSame, processedEnd);
+    }
+
+    int nrOfSame(int a, int b) const
+    {
+        return bookmarks[a].nrOfSame(bookmarks[b]);
+    }
+
+    void sort()
+    {
+        // std::stable_sort(), which is a merge sort, has proved to be much faster
+        // than std::sort() in this context.
+        std::stable_sort(bookmarks.begin(), bookmarks.end());
+    }
+
+    void clearWithin(int indexOf1stInstance,
+                     int longestSame,
+                     int instances)
+    {
+        for (int i = 0; i < instances; ++i)
+        {
+            const char* reportStart =
+                bookmarks[indexOf1stInstance + i].processed;
+
+            for (size_t ix = 0; ix < bookmarks.size() - 1; ++ix)
+                if (bookmarks[ix].processed >= reportStart &&
+                    bookmarks[ix].processed < reportStart + longestSame)
+                {
+                    bookmarks[ix].clear();
+                }
+        }
+        getRidOfHoles();
+    }
+
+private:
+    /**
+     * Removes all bookmarks where the "processed" field is null while maintaining
+     * a sorted bookmark array. It uses a "two index fingers" algorithm looking for
+     * null bookmarks with the left index finger (dest) and for non-null bookmarks
+     * with the right index finger (source).
+     */
+    void getRidOfHoles()
+    {
+        size_t source = 0;
+        for (size_t dest = 0; dest < bookmarks.size() - 1; ++dest)
+            {
+                if (bookmarks[dest].isCleared())
+                    {
+                        if (source <= dest)
+                            source = dest + 1;
+                        while (source < bookmarks.size() && bookmarks[source].isCleared())
+                            ++source;
+
+                        if (source == bookmarks.size())
+                            break;
+
+                        // Now pointing to a null bookmark (dest) and a non-null bookmark
+                        // (source). Swap them.
+                        bookmarks[dest] = bookmarks[source];
+                        bookmarks[source].clear();
+                    }
+            }
+    }
+
+    vector<Bookmark> bookmarks;
+};
+
 /*-----------------------------------------------------------------------------
  * Static Functions
  *---------------------------------------------------------------------------*/
@@ -322,11 +383,6 @@ static void findFiles(const string&         name,
         findFiles(path, ending, excludes, output);
     }
     closedir(dir);
-}
-
-inline void addBookmark(const Bookmark& bm)
-{
-    bookmarks.push_back(bm);
 }
 
 /**
@@ -370,7 +426,7 @@ struct Value { State newState; Action action; };
  * Reads the original text into a processed text, which is returned. Also sets
  * the bookmarks to point into the two strings.
  */
-static const char* process(bool wordMode)
+static const char* process(BookmarkContainer& container, bool wordMode)
 {
     const char ANY = '\0';
     static Cell codeBehavior[] =
@@ -471,7 +527,7 @@ static const char* process(bool wordMode)
                 const Bookmark bm = addChar(c, i, processed);
                 if (timeForNewBookmark)
                 {
-                    addBookmark(bm);
+                    container.addBookmark(bm);
                     timeForNewBookmark = false;
                 }
             }
@@ -480,7 +536,7 @@ static const char* process(bool wordMode)
             else if (it->second.action == ADD_SPACE)
             {
                 addChar(' ', i, processed);
-                addBookmark(addChar(c, i, processed));
+                container.addBookmark(addChar(c, i, processed));
             }
         }
         else if (state == NORMAL && not isspace(c))
@@ -494,7 +550,7 @@ static const char* process(bool wordMode)
                     state = SKIP_TO_EOL;
                 }
                 else
-                    addBookmark(addChar(c, i, processed));
+                    container.addBookmark(addChar(c, i, processed));
             }
             else
                 addChar(c, i, processed);
@@ -544,35 +600,6 @@ static void printUsageAndExit(ExtFlagMode anExtFlagMode, int anExitCode)
              << " etc.)\n";
     }
     exit(anExitCode);
-}
-
-/**
- * Removes all bookmarks where the "processed" field is null while maintaining
- * a sorted bookmark array. It uses a "two index fingers" algorithm looking for
- * null bookmarks with the left index finger (dest) and for non-null bookmarks
- * with the right index finger (source).
- */
-static void getRidOfHoles()
-{
-    size_t source = 0;
-    for (size_t dest = 0; dest < bookmarks.size() - 1; ++dest)
-    {
-        if (bookmarks[dest].isCleared())
-        {
-            if (source <= dest)
-                source = dest + 1;
-            while (source < bookmarks.size() && bookmarks[source].isCleared())
-                ++source;
-
-            if (source == bookmarks.size())
-                break;
-
-            // Now pointing to a null bookmark (dest) and a non-null bookmark
-            // (source). Swap them.
-            bookmarks[dest] = bookmarks[source];
-            bookmarks[source].clear();
-        }
-    }
 }
 
 class Options
@@ -701,6 +728,8 @@ private:
 
 int main(int argc, char* argv[])
 {
+    BookmarkContainer container;
+
     if (argc == 1)
         printUsageAndExit(HIDE_EXT_FLAGS, EXIT_SUCCESS);
 
@@ -711,13 +740,11 @@ int main(int argc, char* argv[])
 
     Bookmark::addFile(0); // Mark end
 
-    const char* processed        = process(options.wordMode);
+    const char* processed        = process(container, options.wordMode);
     const char* processedEnd     = processed + strlen(processed);
     int         totalDuplication = 0;
 
-    // std::stable_sort(), which is a merge sort, has proved to be much faster
-    // than std::sort() in this context.
-    std::stable_sort(bookmarks.begin(), bookmarks.end());
+    container.sort();
 
     for (int count = 0; count < options.nrOfWantedReports; ++count)
     {
@@ -725,16 +752,14 @@ int main(int argc, char* argv[])
         int indexOf1stInstance = 0;
 
         // Find the two bookmarks that have the longest common substring.
-        for (size_t markIx = 0; markIx < bookmarks.size() - 1; ++markIx)
+        for (size_t markIx = 0; markIx < container.size() - 1; ++markIx)
         {
-            if (bookmarks[markIx + 1].isCleared())
+            if (container.isCleared(markIx + 1))
                 break;
 
-            if (bookmarks[markIx].sameAs(bookmarks[markIx + 1],
-                                         longestSame, processedEnd))
+            if (container.same(markIx, markIx + 1, longestSame, processedEnd))
             {
-                const int same =
-                    bookmarks[markIx].nrOfSame(bookmarks[markIx + 1]);
+                const int same = container.nrOfSame(markIx, markIx + 1);
                 if (same > longestSame)
                 {
                     indexOf1stInstance = markIx;
@@ -754,8 +779,7 @@ int main(int argc, char* argv[])
         // pair.
         for (int i = origIndexForLongest - 1; i >= 0; --i)
         {
-            const int same =
-                bookmarks[origIndexForLongest].nrOfSame(bookmarks[i]);
+            const int same = container.nrOfSame(origIndexForLongest, i);
             if (same < almostLongest)
                 break;
             instances++;
@@ -766,11 +790,10 @@ int main(int argc, char* argv[])
 
         // Look for approximate matches in strings just after the current pair.
         for (size_t i = origIndexForLongest + 2;
-             i < bookmarks.size() && !bookmarks[i].isCleared();
+             i < container.size() && !container.isCleared(i);
              ++i)
         {
-            const int same =
-                bookmarks[origIndexForLongest].nrOfSame(bookmarks[i]);
+            const int same = container.nrOfSame(origIndexForLongest, i);
             if (same < almostLongest)
                 break;
             instances++;
@@ -781,10 +804,9 @@ int main(int argc, char* argv[])
         // Report all found instances (exact and approximate matches).
         for (int i = 0; i < instances; ++i)
         {
-            bookmarks[indexOf1stInstance + i].
-                report(longestSame, i + 1,
-                       options.isVerbose && i == instances - 1,
-                       options.wordMode);
+            container.report(indexOf1stInstance + i, longestSame, i + 1,
+                             options.isVerbose && i == instances - 1,
+                             options.wordMode);
         }
         cout << endl;
 
@@ -792,9 +814,7 @@ int main(int argc, char* argv[])
 
         // Clear bookmarks that point to something within the reported area.
         // This is to avoid reporting the same section more than once.
-        Bookmark::clearWithin(indexOf1stInstance, longestSame, instances);
-
-        getRidOfHoles();
+        container.clearWithin(indexOf1stInstance, longestSame, instances);
     } // for (int count = 0; count < options.nrOfWantedReports; ++count)
 
     if (options.totalReport != Options::NO_TOTAL)
