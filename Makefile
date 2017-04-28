@@ -1,6 +1,6 @@
 CXX      := g++
 CC       := $(CXX)
-CXXFLAGS := -W -Wall --static -O2
+CXXFLAGS := -W -Wall -O2
 ifeq ($(OS),Windows_NT)
 PROGRAM := dupfind.exe
 DOS2UNIX := dos2unix
@@ -14,8 +14,8 @@ default: $(PROGRAM)
 
 all: test README.md
 
-$(PROGRAM): dupfind.cc
-	$(CXX) $(CXXFLAGS) -o $@ $<
+$(PROGRAM): dupfind.o
+	$(CXX) --static -o $@ $<
 
 clean:
 	rm -f *.o *.exe dupfind
