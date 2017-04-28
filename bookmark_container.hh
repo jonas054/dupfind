@@ -26,9 +26,8 @@ public:
 
     void sort();
 
-    void clearWithin(int indexOf1stInstance,
-                     int longestSame,
-                     int instances);
+    void clearWithin(int indexOf1stInstance, int longestSame, int instances);
+
 private:
     /**
      * Removes all bookmarks where the "processed" field is null while

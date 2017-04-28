@@ -1,4 +1,6 @@
-#include <algorithm>  // EXIT_FAILURE
+#include "bookmark.hh"
+
+#include <cstdlib>    // EXIT_FAILURE
 #include <fstream>    // ifstream
 #include <iostream>   // cout, cerr, endl, ios, ostream
 #include <iterator>   // istream_iterator
@@ -6,19 +8,16 @@
 #include <sys/stat.h> // struct stat
 #include <string>
 #include <vector>
-#include "bookmark.hh"
 
 using std::cerr;
 using std::cout;
 using std::endl;
 using std::ios;
-using std::istream_iterator;
 using std::string;
 using std::vector;
 
 static const char* order(int aNumber);
 static string      readFileIntoString(const char* aFileName);
-
 
 int                          Bookmark::totalNrOfLines = 0;
 vector<Bookmark::FileRecord> Bookmark::fileRecords;
@@ -139,7 +138,7 @@ static string readFileIntoString(const char* aFileName)
 
     vector<char> vec;
     vec.reserve(fsize);
-    copy(istream_iterator<char>(in), istream_iterator<char>(),
+    copy(std::istream_iterator<char>(in), std::istream_iterator<char>(),
          back_inserter(vec));
 
     vec.push_back(SPECIAL_EOF);

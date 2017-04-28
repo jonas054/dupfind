@@ -1,7 +1,7 @@
-#include <algorithm>  // stable_sort
-
 #include "bookmark.hh"
 #include "bookmark_container.hh"
+
+#include <algorithm>  // stable_sort
 
 void BookmarkContainer::addBookmark(const Bookmark& bm)
 {
