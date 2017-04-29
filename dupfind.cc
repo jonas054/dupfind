@@ -214,6 +214,28 @@ static const char* process(BookmarkContainer& container, bool wordMode)
     return processed;
 }
 
+static int expandSearch(const BookmarkContainer& container,
+                        int                      indexForLongest,
+                        int                      almostLongest,
+                        int                      startingPoint,
+                        int                      loopIncrement,
+                        int&                     longestSame)
+{
+    int steps = 0;
+    for (int i = indexForLongest + startingPoint;
+         i >= 0 && i < int(container.size()) && !container.isCleared(i);
+         i += loopIncrement)
+    {
+        const int same = container.nrOfSame(indexForLongest, i);
+        if (same < almostLongest)
+            break;
+        steps++;
+        if (longestSame > same)
+            longestSame = same;
+    }
+    return steps;
+}
+
 /*-----------------------------------------------------------------------------
  * Main
  *---------------------------------------------------------------------------*/
@@ -263,35 +285,19 @@ int main(int argc, char* argv[])
         if (longestSame < options.minLength) // Exit loop if the common
             break;                           // substring is too short.
 
-        int instances = 2;
         int almostLongest = (longestSame * options.proximityFactor) / 100;
-        int origIndexForLongest = indexOf1stInstance;
 
         // Look for approximate matches in strings just before the current
         // pair.
-        for (int i = origIndexForLongest - 1; i >= 0; --i)
-        {
-            const int same = container.nrOfSame(origIndexForLongest, i);
-            if (same < almostLongest)
-                break;
-            instances++;
-            if (longestSame > same)
-                longestSame = same;
-            indexOf1stInstance = i;
-        }
+        int stepsBackward = expandSearch(container, indexOf1stInstance,
+                                         almostLongest, -1, -1, longestSame);
 
         // Look for approximate matches in strings just after the current pair.
-        for (size_t i = origIndexForLongest + 2;
-             i < container.size() && !container.isCleared(i);
-             ++i)
-        {
-            const int same = container.nrOfSame(origIndexForLongest, i);
-            if (same < almostLongest)
-                break;
-            instances++;
-            if (longestSame > same)
-                longestSame = same;
-        }
+        int stepsForward = expandSearch(container, indexOf1stInstance,
+                                        almostLongest, 2, 1, longestSame);
+
+        int instances = 2 + stepsBackward + stepsForward;
+        indexOf1stInstance -= stepsBackward;
 
         // Report all found instances (exact and approximate matches).
         for (int i = 0; i < instances; ++i)
