@@ -31,3 +31,6 @@ dupfind
 
 # Generated test data
 test-output.txt
+
+# Generated dependency files
+*.o.d
