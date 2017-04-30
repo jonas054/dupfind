@@ -1,12 +1,14 @@
 CXX      := g++
 CC       := $(CXX)
-CXXFLAGS := -W -Wall -O2
+CXXFLAGS := -W -Wall -O2 -g
 ifeq ($(OS),Windows_NT)
-PROGRAM := dupfind.exe
+PROGRAM  := dupfind.exe
 DOS2UNIX := dos2unix
+LDFLAGS  := --static
 else
-PROGRAM := dupfind
+PROGRAM  := dupfind
 DOS2UNIX := cat
+LDFLAGS  :=
 endif
 SOURCE   := $(wildcard *.cc)
 OBJS     := $(patsubst %.cc,%.o,$(SOURCE))
@@ -22,7 +24,7 @@ all: test README.md
 	@$(CXX) -MM $< > $@.d
 
 $(PROGRAM): $(OBJS)
-	$(CXX) --static -o $@ $^
+	$(CXX) $(LDFLAGS) -o $@ $^
 
 clean:
 	rm -f *.o *.exe dupfind
