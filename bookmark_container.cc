@@ -53,8 +53,7 @@ void BookmarkContainer::clearWithin(int indexOf1stInstance,
 {
     for (int i = 0; i < instances; ++i)
     {
-        const char* reportStart =
-            bookmarks[indexOf1stInstance + i].processed;
+        const char* reportStart = bookmarks[indexOf1stInstance + i].processed;
 
         for (size_t ix = 0; ix < bookmarks.size() - 1; ++ix)
             if (bookmarks[ix].processed >= reportStart &&
@@ -87,8 +86,8 @@ void BookmarkContainer::getRidOfHoles()
             if (source == bookmarks.size())
                 break;
 
-            // Now pointing to a null bookmark (dest) and a non-null
-            // bookmark (source). Swap them.
+            // Now pointing to a null bookmark (dest) and a non-null bookmark
+            // (source). Swap them.
             bookmarks[dest] = bookmarks[source];
             bookmarks[source].clear();
         }

@@ -146,9 +146,7 @@ void Options::processFileName(const char* arg)
              << endl;
     }
     else
-    {
         Bookmark::addFile(arg);
-    }
 }
 
 void Options::printUsageAndExit(ExtFlagMode anExtFlagMode, int anExitCode)
