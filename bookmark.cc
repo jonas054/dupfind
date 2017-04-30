@@ -15,8 +15,6 @@ int                               Bookmark::totalNrOfLines = 0;
 std::vector<Bookmark::FileRecord> Bookmark::fileRecords;
 std::string                       Bookmark::totalString;
 
-Bookmark::Bookmark(int i, const char* p): original(i), processed(p) {}
-
 /**
  * Reports one instance of duplication and optionally prints the duplicated
  * string.
@@ -33,14 +31,14 @@ void Bookmark::report(int aNrOfSame,
 
     cout << *this << ":Duplication " << count << " (" << anInstanceNr
          << order(anInstanceNr) << " instance";
+    int nrOfLines = details(aNrOfSame, COUNT_LINES, wordMode);
     if (anInstanceNr == 1)
     {
-        int nrOfLines = details(aNrOfSame, COUNT_LINES, wordMode);
         cout << ", " << aNrOfSame << " characters, "
              << nrOfLines << " line" << (nrOfLines == 1 ? "" : "s");
     }
     else
-        totalNrOfLines += details(aNrOfSame, COUNT_LINES, wordMode);
+        totalNrOfLines += nrOfLines;
 
     cout << ")." << endl;
     if (isVerbose_)
@@ -55,10 +53,6 @@ static const char* order(int aNumber)
     else if (aNumber % 10 == 3 && aNumber % 100 != 13) return "rd";
     else                                               return "th";
 }
-
-void Bookmark::clear() { this->processed = 0; }
-
-bool Bookmark::isCleared() const { return this->processed == 0; }
 
 bool Bookmark::operator<(const Bookmark& another) const // Used in sorting.
 {
@@ -98,8 +92,6 @@ Bookmark::sameAs(Bookmark b, int aNrOfCharacters, const char* anEnd) const
     return true;
 }
 
-int Bookmark::getTotalNrOfLines() { return totalNrOfLines; }
-
 void Bookmark::addFile(const char* fileName)
 {
     if (fileName)
@@ -107,10 +99,6 @@ void Bookmark::addFile(const char* fileName)
 
     fileRecords.push_back(FileRecord(fileName, totalString.length()));
 }
-
-size_t Bookmark::totalLength() { return totalString.length(); }
-
-const char& Bookmark::getChar(int i) { return totalString[i]; }
 
 int
 Bookmark::details(int aProcessedLength, DetailType  aType, bool wordMode) const

@@ -14,7 +14,7 @@ class Bookmark
     };
 
 public:
-    Bookmark(int i, const char* p);
+    Bookmark(int i, const char* p): original(i), processed(p) {}
 
     /**
      * Reports one instance of duplication and optionally prints the duplicated
@@ -25,9 +25,9 @@ public:
                 bool isVerbose_,
                 bool wordMode) const;
 
-    void clear();
+    void clear() { this->processed = 0; }
 
-    bool isCleared() const;
+    bool isCleared() const { return this->processed == 0; }
 
     bool operator<(const Bookmark& another) const; // Used in sorting.
 
@@ -40,13 +40,13 @@ public:
      */
     bool sameAs(Bookmark b, int aNrOfCharacters, const char* anEnd) const;
 
-    static int getTotalNrOfLines();
+    static int getTotalNrOfLines() { return totalNrOfLines; }
 
     static void addFile(const char* fileName);
 
-    static size_t totalLength();
+    static size_t totalLength() { return totalString.length(); }
 
-    static const char& getChar(int i);
+    static const char& getChar(int i) { return totalString[i]; }
 
 private:
     friend std::ostream& operator<<(std::ostream& os, const Bookmark& b);
