@@ -17,6 +17,8 @@
 #include "options.hh"
 #include "parser.hh"
 
+using std::cout;
+
 /*-----------------------------------------------------------------------------
  * Static Functions
  *---------------------------------------------------------------------------*/
@@ -96,7 +98,7 @@ static bool reportOne(BookmarkContainer& container,
                          options.isVerbose && i == instances - 1,
                          options.wordMode);
     }
-    std::cout << std::endl;
+    cout << std::endl;
 
     totalDuplication += longestSame * instances;
 
@@ -141,9 +143,8 @@ int main(int argc, char* argv[])
     if (options.totalReport != Options::NO_TOTAL)
     {
         const int length = processedEnd - processed;
-        std::cout << "Duplication = " << Bookmark::getTotalNrOfLines()
-                  << " lines, "
-                  << (100 * totalDuplication + length / 2) / length << " %\n";
+        cout << "Duplication = " << Bookmark::getTotalNrOfLines() << " lines, "
+             << (100 * totalDuplication + length / 2) / length << " %\n";
     }
     delete [] processed;
     return 0;
