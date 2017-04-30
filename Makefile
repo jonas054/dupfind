@@ -38,61 +38,24 @@ README.md: $(PROGRAM)
 	echo "\`\`\`" >> $@
 	rm help.txt
 
-# Help
-TC_001_CMD := $(PROGRAM) -h
-# Files ending with
-TC_002_CMD := $(PROGRAM) -e .rb
-# Name files on command line
-TC_003_CMD := $(PROGRAM) offense_count_formatter.rb worst_offenders_formatter.rb
-# Total
-TC_004_CMD := $(PROGRAM) -e .rb -t
-# Total including test files
-TC_005_CMD := $(PROGRAM) -e .rb -T
-# Verbose
-TC_006_CMD := $(PROGRAM) -e .rb -v
-# Exclude
-TC_007_CMD := $(PROGRAM) -x offense_count -e .rb
-# Word mode
-TC_008_CMD := $(PROGRAM) -w -e .rb
-# Minimum length
-TC_009_CMD := $(PROGRAM) -m200 -e .rb
-# Count
-TC_010_CMD := $(PROGRAM) -8 -e .rb
-# Proximity
-TC_011_CMD := $(PROGRAM) -p15 -e .rb
+define testcase
+	echo $(1)":" $(PROGRAM) $(2) $(3)
+	cd tests/data && ../../$(PROGRAM) $(2) > ../$(1)/test-output.txt
+	diff -w tests/$(1)/expected-test-output.txt tests/$(1)/test-output.txt
+endef
 
 test: $(PROGRAM)
-	@echo TC 001: $(TC_001_CMD)
-	@./$(TC_001_CMD) 2> tests/tc001/test-output.txt || true
-	@diff -w tests/tc001/expected-test-output.txt tests/tc001/test-output.txt
-	@echo TC 002: $(TC_002_CMD)
-	@cd tests/data && ../../$(TC_002_CMD) > ../tc002/test-output.txt
-	@diff -w tests/tc002/expected-test-output.txt tests/tc002/test-output.txt
-	@echo TC 003: $(TC_003_CMD)
-	@cd tests/data && ../../$(TC_003_CMD) > ../tc003/test-output.txt
-	@diff -w tests/tc003/expected-test-output.txt tests/tc003/test-output.txt
-	@echo TC 004: $(TC_004_CMD)
-	@cd tests/data && ../../$(TC_004_CMD) > ../tc004/test-output.txt
-	@diff -w tests/tc004/expected-test-output.txt tests/tc004/test-output.txt
-	@echo TC 005: $(TC_005_CMD)
-	@cd tests/data && ../../$(TC_005_CMD) > ../tc005/test-output.txt
-	@diff -w tests/tc005/expected-test-output.txt tests/tc005/test-output.txt
-	@echo TC 006: $(TC_006_CMD)
-	@cd tests/data && ../../$(TC_006_CMD) > ../tc006/test-output.txt
-	@diff -w tests/tc006/expected-test-output.txt tests/tc006/test-output.txt
-	@echo TC 007: $(TC_007_CMD)
-	@cd tests/data && ../../$(TC_007_CMD) > ../tc007/test-output.txt
-	@diff -w tests/tc007/expected-test-output.txt tests/tc007/test-output.txt
-	@echo TC 008: $(TC_008_CMD)
-	@cd tests/data && ../../$(TC_008_CMD) > ../tc008/test-output.txt
-	@diff -w tests/tc008/expected-test-output.txt tests/tc008/test-output.txt
-	@echo TC 009: $(TC_009_CMD)
-	@cd tests/data && ../../$(TC_009_CMD) > ../tc009/test-output.txt
-	@diff -w tests/tc009/expected-test-output.txt tests/tc009/test-output.txt
-	@echo TC 010: $(TC_010_CMD)
-	@cd tests/data && ../../$(TC_010_CMD) > ../tc010/test-output.txt
-	@diff -w tests/tc010/expected-test-output.txt tests/tc010/test-output.txt
-	@echo TC 011: $(TC_011_CMD)
-	@cd tests/data && ../../$(TC_011_CMD) > ../tc011/test-output.txt
-	@diff -w tests/tc011/expected-test-output.txt tests/tc011/test-output.txt
+	@$(call testcase,tc001,-h, "(Help)")
+	@$(call testcase,tc002,-e .rb, "(Files ending with)")
+	@$(call testcase,tc003,\
+                offense_count_formatter.rb worst_offenders_formatter.rb,\
+                "(Name files on command line)")
+	@$(call testcase,tc004,-e .rb -t, "(Total)")
+	@$(call testcase,tc005,-e .rb -T, "(Total including test files)")
+	@$(call testcase,tc006,-e .rb -v, "(Verbose)")
+	@$(call testcase,tc007,-x offense_count -e .rb, "(Exclude)")
+	@$(call testcase,tc008,-w -e .rb, "(Word mode)")
+	@$(call testcase,tc009,-m200 -e .rb, "(Minimum length)")
+	@$(call testcase,tc010,-8 -e .rb, "(Count)")
+	@$(call testcase,tc011,-p15 -e .rb, "(Proximity)")
 	@echo OK

@@ -2,7 +2,7 @@
 #include "bookmark.hh"
 
 #include <algorithm>  // sort
-#include <iostream>   // cerr, endl
+#include <iostream>   // ostream, cout, cerr, endl
 #include <cstring>    // strcmp, strncmp, strlen
 #include <climits>    // INT_MAX
 #include <sys/stat.h> // struct stat
@@ -96,18 +96,20 @@ int Options::processFlag(int i, int argc, char* argv[])
             printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
         }
         break;
+    case 'h':
+        printUsageAndExit(SHOW_EXT_FLAGS, EXIT_SUCCESS);
     default:
         printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
     }
     return i;
 }
 
-void Options::findFiles(const string&         name,
+void Options::findFiles(const string&         dirName,
                         const string&         ending,
                         const vector<string>& excludes,
                         vector<string>&       output)
 {
-    DIR* dir = opendir(name.c_str());
+    DIR* dir = opendir(dirName.c_str());
 
     if (!dir)
         return;
@@ -117,7 +119,7 @@ void Options::findFiles(const string&         name,
         const string entryName = entry->d_name;
         if (entryName == "." || entryName == "..")
             continue;
-        const string path = name + "/" + entry->d_name;
+        const string path = dirName + "/" + entry->d_name;
         bool toBeExcluded = false;
         for (size_t e = 0; e < excludes.size(); ++e)
             if (path.find(excludes[e]) != string::npos)
@@ -151,37 +153,38 @@ void Options::processFileName(const char* arg)
 
 void Options::printUsageAndExit(ExtFlagMode anExtFlagMode, int anExitCode)
 {
-    cerr << "Usage: dupfind [-v] [-w] [-<n>|-m<n>] "
-         << (anExtFlagMode == SHOW_EXT_FLAGS ? "[-p<n>] " : "")
-         << "[-x <substring>] [-e <ending> ...]\n"
-         << "       dupfind [-v] [-w] [-<n>|-m<n>] "
-         << (anExtFlagMode == SHOW_EXT_FLAGS ? "[-p<n>] " : "") << "<files>\n"
-         << "       dupfind -t"
-         << (anExtFlagMode == SHOW_EXT_FLAGS ? "|-T" : "")
-         << " [-v] [-w] <files>\n"
-         << "       -v:    verbose, print strings that are duplicated\n"
-         << "       -w:    calculate duplication based on words rather than "
-         << "lines\n"
-         << "       -10:   report the 10 longest duplications instead of 5,"
-         << " which is default\n"
-         << "       -m300: report all duplications that are at least 300"
-         << " characters long\n"
-         << "       -x:    exclude paths matching substring when searching for"
-         << " files with -e\n"
-         << "              (-x must come before the -e option it applies to)\n"
-         << "       -e:    search recursively for files whose names end with"
-         << " the given ending\n"
-         << "              (several -e options can be given)\n";
+    std::ostream& os = (anExitCode == 0) ? std::cout : cerr;
+    os << "Usage: dupfind [-v] [-w] [-<n>|-m<n>] "
+       << (anExtFlagMode == SHOW_EXT_FLAGS ? "[-p<n>] " : "")
+       << "[-x <substring>] [-e <ending> ...]\n"
+       << "       dupfind [-v] [-w] [-<n>|-m<n>] "
+       << (anExtFlagMode == SHOW_EXT_FLAGS ? "[-p<n>] " : "") << "<files>\n"
+       << "       dupfind -t"
+       << (anExtFlagMode == SHOW_EXT_FLAGS ? "|-T" : "")
+       << " [-v] [-w] <files>\n"
+       << "       -v:    verbose, print strings that are duplicated\n"
+       << "       -w:    calculate duplication based on words rather than "
+       << "lines\n"
+       << "       -10:   report the 10 longest duplications instead of 5,"
+       << " which is default\n"
+       << "       -m300: report all duplications that are at least 300"
+       << " characters long\n"
+       << "       -x:    exclude paths matching substring when searching for"
+       << " files with -e\n"
+       << "              (-x must come before the -e option it applies to)\n"
+       << "       -e:    search recursively for files whose names end with"
+       << " the given ending\n"
+       << "              (several -e options can be given)\n";
     if (anExtFlagMode == SHOW_EXT_FLAGS)
-    {
-        cerr << "       -p50:  use 50% proximity (more but shorter matches); "
-             << "90% is default\n";
-    }
-    cerr << "       -t:    set -m100 and sum up the total duplication\n";
+        {
+            os << "       -p50:  use 50% proximity (more but shorter matches); "
+               << "90% is default\n";
+        }
+    os << "       -t:    set -m100 and sum up the total duplication\n";
     if (anExtFlagMode == SHOW_EXT_FLAGS)
-    {
-        cerr << "       -T:    same as -t but accept any file (test code etc.)"
-             << endl;
-    }
+        {
+            os << "       -T:    same as -t but accept any file (test code etc.)"
+               << endl;
+        }
     exit(anExitCode);
 }
