@@ -1,27 +1,19 @@
 #include "bookmark.hh"
+#include "file.hh" // readFileIntoString
 
-#include <cstdlib>    // EXIT_FAILURE
-#include <fstream>    // ifstream
-#include <iostream>   // cout, cerr, endl, ios, ostream
-#include <iterator>   // istream_iterator
+#include <iostream>   // cout, endl, ostream
 #include <cstring>    // strcmp
-#include <sys/stat.h> // struct stat
 #include <string>
 #include <vector>
 
-using std::cerr;
 using std::cout;
 using std::endl;
-using std::ios;
-using std::string;
-using std::vector;
 
 static const char* order(int aNumber);
-static string      readFileIntoString(const char* aFileName);
 
-int                          Bookmark::totalNrOfLines = 0;
-vector<Bookmark::FileRecord> Bookmark::fileRecords;
-string                       Bookmark::totalString;
+int                               Bookmark::totalNrOfLines = 0;
+std::vector<Bookmark::FileRecord> Bookmark::fileRecords;
+std::string                       Bookmark::totalString;
 
 Bookmark::Bookmark(int i, const char* p): original(i), processed(p) {}
 
@@ -114,36 +106,6 @@ void Bookmark::addFile(const char* fileName)
         totalString += readFileIntoString(fileName);
 
     fileRecords.push_back(FileRecord(fileName, totalString.length()));
-}
-
-static string readFileIntoString(const char* aFileName)
-{
-    struct stat s;
-    if ((stat(aFileName, &s) == 0) && (s.st_mode & S_IFDIR))
-    {
-        cerr << "dupfind: " << aFileName << " is a directory.\n";
-        exit(EXIT_FAILURE);
-    }
-
-    std::ifstream in(aFileName, ios::in);
-    if (!in.good())
-    {
-        cerr << "dupfind: File " << aFileName << " not found.\n";
-        exit(EXIT_FAILURE);
-    }
-    in.unsetf(ios::skipws);
-    in.seekg(0, ios::end);
-    std::streampos fsize = in.tellg() + (std::streamoff)1;
-    in.seekg(0, ios::beg);
-
-    vector<char> vec;
-    vec.reserve(fsize);
-    copy(std::istream_iterator<char>(in), std::istream_iterator<char>(),
-         back_inserter(vec));
-
-    vec.push_back(SPECIAL_EOF);
-
-    return string(vec.begin(), vec.end());
 }
 
 size_t Bookmark::totalLength() { return totalString.length(); }

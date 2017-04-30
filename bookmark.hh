@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 
-extern const char SPECIAL_EOF;
-
 class Bookmark
 {
     struct FileRecord
