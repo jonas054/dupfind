@@ -1,18 +1,15 @@
-ifeq ($(OS),Windows_NT)
-OSTYPE := $(OS)
-PROGRAM := $(OSTYPE)/dupfind.exe
-DOS2UNIX := dos2unix
-else
-OSTYPE := $(_system_type)
-PROGRAM := $(OSTYPE)/dupfind
-DOS2UNIX := cat
-endif
-
 CXX      := g++
 CC       := $(CXX)
 CXXFLAGS := -W -Wall -O2
+ifeq ($(OS),Windows_NT)
+PROGRAM := dupfind.exe
+DOS2UNIX := dos2unix
+else
+PROGRAM := dupfind
+DOS2UNIX := cat
+endif
 SOURCE   := $(wildcard *.cc)
-OBJS     := $(patsubst %.cc,$(OSTYPE)/%.o,$(SOURCE))
+OBJS     := $(patsubst %.cc,%.o,$(SOURCE))
 
 default: $(PROGRAM)
 
@@ -20,16 +17,15 @@ all: test README.md
 
 -include $(OBJS:.o=.o.d)
 
-$(OSTYPE)/%.o: %.cc
-	@mkdir -p $(OSTYPE)
+%.o: %.cc
 	$(CXX) -c $(CXXFLAGS) $< -o $@
-	@$(CXX) -MM $< | sed "s-^\(\w*\.o:\)-$(OSTYPE)/\1-" > $@.d
+	@$(CXX) -MM $< > $@.d
 
 $(PROGRAM): $(OBJS)
 	$(CXX) --static -o $@ $^
 
 clean:
-	rm -rf $(OSTYPE)
+	rm -f *.o *.exe dupfind
 
 README.md: $(PROGRAM)
 	./$(PROGRAM) -h 2>&1 | $(DOS2UNIX) > help.txt
