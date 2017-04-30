@@ -125,7 +125,8 @@ int main(int argc, char* argv[])
 
     Bookmark::addFile(0); // Mark end
 
-    const char* processed        = process(container, options.wordMode);
+    const char* processed        = Parser::process(container,
+                                                   options.wordMode);
     const char* processedEnd     = processed + strlen(processed);
     int         totalDuplication = 0;
 

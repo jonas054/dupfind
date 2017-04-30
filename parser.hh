@@ -3,6 +3,10 @@
 
 class BookmarkContainer;
 
-extern const char* process(BookmarkContainer& container, bool wordMode);
+class Parser
+{
+public:
+    static const char* process(BookmarkContainer& container, bool wordMode);
+};
 
 #endif

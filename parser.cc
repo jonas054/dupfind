@@ -102,7 +102,7 @@ static Cell textBehavior[] =
  * Reads the original text into a processed text, which is returned. Also sets
  * the bookmarks to point into the two strings.
  */
-const char* process(BookmarkContainer& container, bool wordMode)
+const char* Parser::process(BookmarkContainer& container, bool wordMode)
 {
     map<Key, Value> matrix;
     Cell* cells = wordMode ? textBehavior : codeBehavior;
