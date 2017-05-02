@@ -9,7 +9,7 @@
 using std::string;
 using std::cerr;
 using std::ios;
-using std::ifstream;
+using std::istream_iterator;
 
 // We use ASCII code 7 as a special value denoting EOF.
 const char SPECIAL_EOF = '\x7';
@@ -36,7 +36,7 @@ extern string readFileIntoString(const char* aFileName)
 
     std::vector<char> vec;
     vec.reserve(fsize);
-    copy(std::istream_iterator<char>(in), std::istream_iterator<char>(),
+    copy(istream_iterator<char>(in), istream_iterator<char>(),
          back_inserter(vec));
 
     vec.push_back(SPECIAL_EOF);

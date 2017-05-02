@@ -75,7 +75,6 @@ void BookmarkContainer::getRidOfHoles()
 {
     size_t source = 0;
     for (size_t dest = 0; dest < bookmarks.size() - 1; ++dest)
-    {
         if (bookmarks[dest].isCleared())
         {
             if (source <= dest)
@@ -91,5 +90,4 @@ void BookmarkContainer::getRidOfHoles()
             bookmarks[dest] = bookmarks[source];
             bookmarks[source].clear();
         }
-    }
 }
