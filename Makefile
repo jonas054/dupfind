@@ -10,7 +10,7 @@ PROGRAM  := dupfind
 DOS2UNIX := cat
 LDFLAGS  :=
 endif
-SOURCE   := $(wildcard *.cc)
+SOURCE   := $(filter-out %_flymake.cc,$(wildcard *.cc))
 OBJS     := $(patsubst %.cc,%.o,$(SOURCE))
 
 default: $(PROGRAM)
