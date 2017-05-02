@@ -14,7 +14,7 @@ class Bookmark
     };
 
 public:
-    Bookmark(int i, const char* p): original(i), processed(p) {}
+    Bookmark(int i = 0, const char* p = 0): original(i), processed(p) {}
 
     /**
      * Reports one instance of duplication and optionally prints the duplicated

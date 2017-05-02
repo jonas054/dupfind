@@ -1,7 +1,7 @@
 #include "bookmark.hh"
 #include "bookmark_container.hh"
 
-#include <algorithm>  // stable_sort
+#include <algorithm> // stable_sort, remove_if, mem_fun_ref
 
 void BookmarkContainer::addBookmark(const Bookmark& bm)
 {
@@ -67,27 +67,12 @@ void BookmarkContainer::clearWithin(int indexOf1stInstance,
 
 /**
  * Removes all bookmarks where the "processed" field is null while maintaining
- * a sorted bookmark array. It uses a "two index fingers" algorithm looking for
- * null bookmarks with the left index finger (dest) and for non-null bookmarks
- * with the right index finger (source).
+ * a sorted bookmark array.
  */
 void BookmarkContainer::getRidOfHoles()
 {
-    size_t source = 0;
-    for (size_t dest = 0; dest < bookmarks.size() - 1; ++dest)
-        if (bookmarks[dest].isCleared())
-        {
-            if (source <= dest)
-                source = dest + 1;
-            while (source < bookmarks.size() && bookmarks[source].isCleared())
-                ++source;
-
-            if (source == bookmarks.size())
-                break;
-
-            // Now pointing to a null bookmark (dest) and a non-null bookmark
-            // (source). Swap them.
-            bookmarks[dest] = bookmarks[source];
-            bookmarks[source].clear();
-        }
+    std::vector<Bookmark>::iterator newEnd =
+        std::remove_if(bookmarks.begin(), bookmarks.end(),
+                       std::mem_fun_ref(&Bookmark::isCleared));
+    bookmarks.resize(newEnd - bookmarks.begin());
 }
