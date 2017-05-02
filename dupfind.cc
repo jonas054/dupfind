@@ -19,30 +19,82 @@
 
 using std::cout;
 
+struct Duplication
+{
+    int instances;
+    int longestSame;
+    int indexOf1stInstance;
+};
+
 /*-----------------------------------------------------------------------------
  * Static Functions
  *---------------------------------------------------------------------------*/
 
 static int expandSearch(const BookmarkContainer& container,
-                        int                      indexForLongest,
+                        Duplication&             duplication,
                         int                      almostLongest,
                         int                      startingPoint,
-                        int                      loopIncrement,
-                        int&                     longestSame)
+                        int                      loopIncrement)
 {
     int steps = 0;
-    for (int i = indexForLongest + startingPoint;
-         i >= 0 && i < int(container.size()) && !container.isCleared(i);
+    for (int i = duplication.indexOf1stInstance + startingPoint;
+         i >= 0 && i < int(container.size()) && not container.isCleared(i);
          i += loopIncrement)
     {
-        const int same = container.nrOfSame(indexForLongest, i);
+        const int same = container.nrOfSame(duplication.indexOf1stInstance, i);
         if (same < almostLongest)
             break;
         steps++;
-        if (longestSame > same)
-            longestSame = same;
+        if (duplication.longestSame > same)
+            duplication.longestSame = same;
     }
     return steps;
+}
+
+static Duplication findWorst(const BookmarkContainer& container,
+                             const Options&           options,
+                             const char*              processedEnd)
+{
+    Duplication result;
+    result.instances          = 0;
+    result.longestSame        = 0;
+    result.indexOf1stInstance = 0;
+
+    // Find the two bookmarks that have the longest common substring.
+    for (size_t markIx = 0; markIx < container.size() - 1; ++markIx)
+    {
+        if (container.isCleared(markIx + 1))
+            break;
+
+        if (container.same(markIx, markIx + 1, result.longestSame,
+                           processedEnd))
+        {
+            const int same = container.nrOfSame(markIx, markIx + 1);
+            if (same > result.longestSame)
+            {
+                result.indexOf1stInstance = markIx;
+                result.longestSame        = same;
+            }
+        }
+    }
+
+    if (result.longestSame >= options.minLength)
+    {
+        int almostLongest =
+            (result.longestSame * options.proximityFactor) / 100;
+
+        // Look for approximate matches in strings just before the current
+        // pair.
+        int stepsBackward = expandSearch(container, result, almostLongest, -1,
+                                         -1);
+
+        // Look for approximate matches in strings just after the current pair.
+        int stepsForward = expandSearch(container, result, almostLongest, 2,
+                                        1);
+        result.instances = 2 + stepsBackward + stepsForward;
+        result.indexOf1stInstance -= stepsBackward;
+    }
+    return result;
 }
 
 /**
@@ -54,58 +106,25 @@ static bool reportOne(BookmarkContainer& container,
                       const char*        processedEnd,
                       int&               totalDuplication)
 {
-    int longestSame        = 0;
-    int indexOf1stInstance = 0;
-
-    // Find the two bookmarks that have the longest common substring.
-    for (size_t markIx = 0; markIx < container.size() - 1; ++markIx)
-    {
-        if (container.isCleared(markIx + 1))
-            break;
-
-        if (container.same(markIx, markIx + 1, longestSame, processedEnd))
-        {
-            const int same = container.nrOfSame(markIx, markIx + 1);
-            if (same > longestSame)
-            {
-                indexOf1stInstance = markIx;
-                longestSame        = same;
-            }
-        }
-    }
-
-    if (longestSame < options.minLength) // Exit loop if the common
-        return false;                    // substring is too short.
-
-    int almostLongest = (longestSame * options.proximityFactor) / 100;
-
-    // Look for approximate matches in strings just before the current
-    // pair.
-    int stepsBackward = expandSearch(container, indexOf1stInstance,
-                                     almostLongest, -1, -1, longestSame);
-
-    // Look for approximate matches in strings just after the current pair.
-    int stepsForward = expandSearch(container, indexOf1stInstance,
-                                    almostLongest, 2, 1, longestSame);
-
-    int instances = 2 + stepsBackward + stepsForward;
-    indexOf1stInstance -= stepsBackward;
+    Duplication worst = findWorst(container, options, processedEnd);
+    if (worst.instances == 0)
+        return false;
 
     // Report all found instances (exact and approximate matches).
-    for (int i = 0; i < instances; ++i)
+    for (int i = 0; i < worst.instances; ++i)
     {
-        container.report(indexOf1stInstance + i, longestSame, i + 1,
-                         options.isVerbose && i == instances - 1,
+        container.report(worst.indexOf1stInstance + i, worst.longestSame,
+                         i + 1, options.isVerbose && i == worst.instances - 1,
                          options.wordMode);
     }
     cout << std::endl;
 
-    totalDuplication += longestSame * instances;
+    totalDuplication += worst.longestSame * worst.instances;
 
     // Clear bookmarks that point to something within the reported area.
     // This is to avoid reporting the same section more than once.
-    container.clearWithin(indexOf1stInstance, longestSame, instances);
-
+    container.clearWithin(worst.indexOf1stInstance, worst.longestSame,
+                          worst.instances);
     return true;
 }
 
