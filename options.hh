@@ -19,7 +19,9 @@ public:
     std::vector<std::string> foundFiles;
     std::vector<std::string> excludes;
 
-    Options(int argc, char* argv[]);
+    Options();
+
+    void parse(int argc, char* argv[]);
 
     static void printUsageAndExit(ExtFlagMode anExtFlagMode, int anExitCode);
 

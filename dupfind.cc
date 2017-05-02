@@ -12,6 +12,7 @@
 #include <iostream>   // cout, endl
 #include <cstring>    // strlen
 
+#include "dupfind.hh"
 #include "bookmark.hh"
 #include "bookmark_container.hh"
 #include "options.hh"
@@ -19,43 +20,26 @@
 
 using std::cout;
 
-struct Duplication
+int Dupfind::run(int argc, char* argv[])
 {
-    Duplication(): instances(0), longestSame(0), indexOf1stInstance(0) {}
+    itsOptions.parse(argc, argv);
 
-    int instances;
-    int longestSame;
-    int indexOf1stInstance;
-};
+    const char* processed = Parser::process(itsContainer, itsOptions.wordMode);
+    const char* processedEnd = processed + strlen(processed);
 
-static int expandSearch(const BookmarkContainer&, Duplication&, int, int, int);
-static Duplication findWorst(const BookmarkContainer&,
-                             const Options&,
-                             const char*);
-static bool reportOne(BookmarkContainer&, const Options&, const char*, int&);
+    itsContainer.sort();
 
-int main(int argc, char* argv[])
-{
-    Options           options(argc, argv);
-    BookmarkContainer container;
-    const char*       processed = Parser::process(container,
-                                                  options.wordMode);
-    const char*       processedEnd = processed + strlen(processed);
-    int               totalDuplication = 0;
-
-    container.sort();
-
-    for (int count = 0; count < options.nrOfWantedReports; ++count)
+    for (int count = 0; count < itsOptions.nrOfWantedReports; ++count)
     {
-        if (not reportOne(container, options, processedEnd, totalDuplication))
+        if (not reportOne(processedEnd))
             break;
     }
 
-    if (options.totalReport != Options::NO_TOTAL)
+    if (itsOptions.totalReport != Options::NO_TOTAL)
     {
         const int length = processedEnd - processed;
         cout << "Duplication = " << Bookmark::getTotalNrOfLines() << " lines, "
-             << (100 * totalDuplication + length / 2) / length << " %\n";
+             << (100 * itsTotalDuplication + length / 2) / length << " %\n";
     }
     delete [] processed;
     return 0;
@@ -65,49 +49,45 @@ int main(int argc, char* argv[])
  * Reports one duplication, two or more instances. Returns true if a report was
  * made, false if no big enough duplication could be found.
  */
-static bool reportOne(BookmarkContainer& container,
-                      const Options&     options,
-                      const char*        processedEnd,
-                      int&               totalDuplication)
+bool Dupfind::reportOne(const char* processedEnd)
 {
-    Duplication worst = findWorst(container, options, processedEnd);
+    Duplication worst = findWorst(processedEnd);
     if (worst.instances == 0)
         return false;
 
     // Report all found instances (exact and approximate matches).
     for (int i = 0; i < worst.instances; ++i)
     {
-        container.report(worst.indexOf1stInstance + i, worst.longestSame,
-                         i + 1, options.isVerbose && i == worst.instances - 1,
-                         options.wordMode);
+        itsContainer.report(worst.indexOf1stInstance + i, worst.longestSame,
+                            i + 1,
+                            itsOptions.isVerbose && i == worst.instances - 1,
+                            itsOptions.wordMode);
     }
     cout << std::endl;
 
-    totalDuplication += worst.longestSame * worst.instances;
+    itsTotalDuplication += worst.longestSame * worst.instances;
 
     // Clear bookmarks that point to something within the reported area.
     // This is to avoid reporting the same section more than once.
-    container.clearWithin(worst.indexOf1stInstance, worst.longestSame,
-                          worst.instances);
+    itsContainer.clearWithin(worst.indexOf1stInstance, worst.longestSame,
+                             worst.instances);
     return true;
 }
 
-static Duplication findWorst(const BookmarkContainer& container,
-                             const Options&           options,
-                             const char*              processedEnd)
+Dupfind::Duplication Dupfind::findWorst(const char* processedEnd)
 {
     Duplication result;
 
     // Find the two bookmarks that have the longest common substring.
-    for (size_t markIx = 0; markIx < container.size() - 1; ++markIx)
+    for (size_t markIx = 0; markIx < itsContainer.size() - 1; ++markIx)
     {
-        if (container.isCleared(markIx + 1))
+        if (itsContainer.isCleared(markIx + 1))
             break;
 
-        if (container.same(markIx, markIx + 1, result.longestSame,
+        if (itsContainer.same(markIx, markIx + 1, result.longestSame,
                            processedEnd))
         {
-            const int same = container.nrOfSame(markIx, markIx + 1);
+            const int same = itsContainer.nrOfSame(markIx, markIx + 1);
             if (same > result.longestSame)
             {
                 result.indexOf1stInstance = markIx;
@@ -116,37 +96,36 @@ static Duplication findWorst(const BookmarkContainer& container,
         }
     }
 
-    if (result.longestSame >= options.minLength)
+    if (result.longestSame >= itsOptions.minLength)
     {
         int almostLongest =
-            (result.longestSame * options.proximityFactor) / 100;
+            (result.longestSame * itsOptions.proximityFactor) / 100;
 
         // Look for approximate matches in strings just before the current
         // pair.
-        int stepsBackward = expandSearch(container, result, almostLongest, -1,
-                                         -1);
+        int stepsBackward = expandSearch(result, almostLongest, -1, -1);
 
         // Look for approximate matches in strings just after the current pair.
-        int stepsForward = expandSearch(container, result, almostLongest, 2,
-                                        1);
+        int stepsForward = expandSearch(result, almostLongest, 2, 1);
         result.instances = 2 + stepsBackward + stepsForward;
         result.indexOf1stInstance -= stepsBackward;
     }
     return result;
 }
 
-static int expandSearch(const BookmarkContainer& container,
-                        Duplication&             duplication,
-                        int                      almostLongest,
-                        int                      startingPoint,
-                        int                      loopIncrement)
+int Dupfind::expandSearch(Duplication& duplication,
+                          int          almostLongest,
+                          int          startingPoint,
+                          int          loopIncrement)
 {
     int steps = 0;
     for (int i = duplication.indexOf1stInstance + startingPoint;
-         i >= 0 && i < int(container.size()) && not container.isCleared(i);
+         i >= 0 && i < int(itsContainer.size()) &&
+             not itsContainer.isCleared(i);
          i += loopIncrement)
     {
-        const int same = container.nrOfSame(duplication.indexOf1stInstance, i);
+        const int same = itsContainer.nrOfSame(duplication.indexOf1stInstance,
+                                               i);
         if (same < almostLongest)
             break;
         steps++;
@@ -154,4 +133,10 @@ static int expandSearch(const BookmarkContainer& container,
             duplication.longestSame = same;
     }
     return steps;
+}
+
+int main(int argc, char* argv[])
+{
+    Dupfind d;
+    return d.run(argc, argv);
 }

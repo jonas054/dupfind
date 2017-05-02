@@ -15,12 +15,16 @@ using std::endl;
 using std::string;
 using std::vector;
 
-Options::Options(int argc, char* argv[]): nrOfWantedReports(5),
-                                          isVerbose(false),
-                                          totalReport(NO_TOTAL),
-                                          minLength(10),
-                                          proximityFactor(90),
-                                          wordMode(false)
+Options::Options(): nrOfWantedReports(5),
+                    isVerbose(false),
+                    totalReport(NO_TOTAL),
+                    minLength(10),
+                    proximityFactor(90),
+                    wordMode(false)
+{
+}
+
+void Options::parse(int argc, char* argv[])
 {
     if (argc == 1)
         printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_SUCCESS);
