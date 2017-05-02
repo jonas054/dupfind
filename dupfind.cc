@@ -21,6 +21,8 @@ using std::cout;
 
 struct Duplication
 {
+    Duplication(): instances(0), longestSame(0), indexOf1stInstance(0) {}
+
     int instances;
     int longestSame;
     int indexOf1stInstance;
@@ -34,20 +36,12 @@ static bool reportOne(BookmarkContainer&, const Options&, const char*, int&);
 
 int main(int argc, char* argv[])
 {
+    Options           options(argc, argv);
     BookmarkContainer container;
-
-    if (argc == 1)
-        Options::printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_SUCCESS);
-
-    Options options(argc, argv);
-
-    if (Bookmark::totalLength() == 0)
-        Options::printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_FAILURE);
-
-    const char* processed        = Parser::process(container,
-                                                   options.wordMode);
-    const char* processedEnd     = processed + strlen(processed);
-    int         totalDuplication = 0;
+    const char*       processed = Parser::process(container,
+                                                  options.wordMode);
+    const char*       processedEnd = processed + strlen(processed);
+    int               totalDuplication = 0;
 
     container.sort();
 
@@ -103,9 +97,6 @@ static Duplication findWorst(const BookmarkContainer& container,
                              const char*              processedEnd)
 {
     Duplication result;
-    result.instances          = 0;
-    result.longestSame        = 0;
-    result.indexOf1stInstance = 0;
 
     // Find the two bookmarks that have the longest common substring.
     for (size_t markIx = 0; markIx < container.size() - 1; ++markIx)

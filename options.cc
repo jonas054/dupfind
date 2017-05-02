@@ -22,11 +22,17 @@ Options::Options(int argc, char* argv[]): nrOfWantedReports(5),
                                           proximityFactor(90),
                                           wordMode(false)
 {
+    if (argc == 1)
+        printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_SUCCESS);
+
     for (int i = 1; i < argc; ++i)
         if (argv[i][0] == '-')
             i = processFlag(i, argc, argv);
         else
             processFileName(argv[i]);
+
+    if (Bookmark::totalLength() == 0)
+        printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_FAILURE);
 }
 
 int Options::processFlag(int i, int argc, char* argv[])

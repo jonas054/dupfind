@@ -1,0 +1,12 @@
+Usage: dupfind [-v] [-w] [-<n>|-m<n>] [-x <substring>] [-e <ending> ...]
+       dupfind [-v] [-w] [-<n>|-m<n>] <files>
+       dupfind -t [-v] [-w] <files>
+       -v:    verbose, print strings that are duplicated
+       -w:    calculate duplication based on words rather than lines
+       -10:   report the 10 longest duplications instead of 5, which is default
+       -m300: report all duplications that are at least 300 characters long
+       -x:    exclude paths matching substring when searching for files with -e
+              (-x must come before the -e option it applies to)
+       -e:    search recursively for files whose names end with the given ending
+              (several -e options can be given)
+       -t:    set -m100 and sum up the total duplication

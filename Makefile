@@ -45,6 +45,7 @@ define testcase
 endef
 
 test: $(PROGRAM)
+	@$(call testcase,tc000,, "(Default)")
 	@$(call testcase,tc001,-h, "(Help)")
 	@$(call testcase,tc002,-e .rb, "(Files ending with)")
 	@$(call testcase,tc003,\
