@@ -25,19 +25,19 @@ int Dupfind::run(int argc, char* argv[])
     itsOptions.parse(argc, argv);
 
     const char* processed = Parser::process(itsContainer, itsOptions.wordMode);
-    const char* processedEnd = processed + strlen(processed);
+    itsProcessedEnd = processed + strlen(processed);
 
     itsContainer.sort();
 
     for (int count = 0; count < itsOptions.nrOfWantedReports; ++count)
     {
-        if (not reportOne(processedEnd))
+        if (not reportOne())
             break;
     }
 
     if (itsOptions.totalReport != Options::NO_TOTAL)
     {
-        const int length = processedEnd - processed;
+        const int length = itsProcessedEnd - processed;
         cout << "Duplication = " << Bookmark::getTotalNrOfLines() << " lines, "
              << (100 * itsTotalDuplication + length / 2) / length << " %\n";
     }
@@ -49,9 +49,9 @@ int Dupfind::run(int argc, char* argv[])
  * Reports one duplication, two or more instances. Returns true if a report was
  * made, false if no big enough duplication could be found.
  */
-bool Dupfind::reportOne(const char* processedEnd)
+bool Dupfind::reportOne()
 {
-    Duplication worst = findWorst(processedEnd);
+    Duplication worst = findWorst();
     if (worst.instances == 0)
         return false;
 
@@ -74,7 +74,7 @@ bool Dupfind::reportOne(const char* processedEnd)
     return true;
 }
 
-Dupfind::Duplication Dupfind::findWorst(const char* processedEnd)
+Dupfind::Duplication Dupfind::findWorst() const
 {
     Duplication result;
 
@@ -85,7 +85,7 @@ Dupfind::Duplication Dupfind::findWorst(const char* processedEnd)
             break;
 
         if (itsContainer.same(markIx, markIx + 1, result.longestSame,
-                           processedEnd))
+                              itsProcessedEnd))
         {
             const int same = itsContainer.nrOfSame(markIx, markIx + 1);
             if (same > result.longestSame)
@@ -116,7 +116,7 @@ Dupfind::Duplication Dupfind::findWorst(const char* processedEnd)
 int Dupfind::expandSearch(Duplication& duplication,
                           int          almostLongest,
                           int          startingPoint,
-                          int          loopIncrement)
+                          int          loopIncrement) const
 {
     int steps = 0;
     for (int i = duplication.indexOf1stInstance + startingPoint;

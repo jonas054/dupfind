@@ -21,18 +21,19 @@ public:
     int run(int argc, char* argv[]);
 
 private:
+    bool reportOne();
+
+    Duplication findWorst() const;
+
     int expandSearch(Duplication& duplication,
                      int          almostLongest,
                      int          startingPoint,
-                     int          loopIncrement);
-
-    Duplication findWorst(const char* processedEnd);
-
-    bool reportOne(const char* processedEnd);
+                     int          loopIncrement) const;
 
     Options           itsOptions;
     BookmarkContainer itsContainer;
     int               itsTotalDuplication;
+    const char*       itsProcessedEnd;
 };
 
 #endif
