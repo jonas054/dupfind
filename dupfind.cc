@@ -26,29 +26,76 @@ struct Duplication
     int indexOf1stInstance;
 };
 
-/*-----------------------------------------------------------------------------
- * Static Functions
- *---------------------------------------------------------------------------*/
+static int expandSearch(const BookmarkContainer&, Duplication&, int, int, int);
+static Duplication findWorst(const BookmarkContainer&,
+                             const Options&,
+                             const char*);
+static bool reportOne(BookmarkContainer&, const Options&, const char*, int&);
 
-static int expandSearch(const BookmarkContainer& container,
-                        Duplication&             duplication,
-                        int                      almostLongest,
-                        int                      startingPoint,
-                        int                      loopIncrement)
+int main(int argc, char* argv[])
 {
-    int steps = 0;
-    for (int i = duplication.indexOf1stInstance + startingPoint;
-         i >= 0 && i < int(container.size()) && not container.isCleared(i);
-         i += loopIncrement)
+    BookmarkContainer container;
+
+    if (argc == 1)
+        Options::printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_SUCCESS);
+
+    Options options(argc, argv);
+
+    if (Bookmark::totalLength() == 0)
+        Options::printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_FAILURE);
+
+    const char* processed        = Parser::process(container,
+                                                   options.wordMode);
+    const char* processedEnd     = processed + strlen(processed);
+    int         totalDuplication = 0;
+
+    container.sort();
+
+    for (int count = 0; count < options.nrOfWantedReports; ++count)
     {
-        const int same = container.nrOfSame(duplication.indexOf1stInstance, i);
-        if (same < almostLongest)
+        if (not reportOne(container, options, processedEnd, totalDuplication))
             break;
-        steps++;
-        if (duplication.longestSame > same)
-            duplication.longestSame = same;
     }
-    return steps;
+
+    if (options.totalReport != Options::NO_TOTAL)
+    {
+        const int length = processedEnd - processed;
+        cout << "Duplication = " << Bookmark::getTotalNrOfLines() << " lines, "
+             << (100 * totalDuplication + length / 2) / length << " %\n";
+    }
+    delete [] processed;
+    return 0;
+}
+
+/**
+ * Reports one duplication, two or more instances. Returns true if a report was
+ * made, false if no big enough duplication could be found.
+ */
+static bool reportOne(BookmarkContainer& container,
+                      const Options&     options,
+                      const char*        processedEnd,
+                      int&               totalDuplication)
+{
+    Duplication worst = findWorst(container, options, processedEnd);
+    if (worst.instances == 0)
+        return false;
+
+    // Report all found instances (exact and approximate matches).
+    for (int i = 0; i < worst.instances; ++i)
+    {
+        container.report(worst.indexOf1stInstance + i, worst.longestSame,
+                         i + 1, options.isVerbose && i == worst.instances - 1,
+                         options.wordMode);
+    }
+    cout << std::endl;
+
+    totalDuplication += worst.longestSame * worst.instances;
+
+    // Clear bookmarks that point to something within the reported area.
+    // This is to avoid reporting the same section more than once.
+    container.clearWithin(worst.indexOf1stInstance, worst.longestSame,
+                          worst.instances);
+    return true;
 }
 
 static Duplication findWorst(const BookmarkContainer& container,
@@ -97,72 +144,23 @@ static Duplication findWorst(const BookmarkContainer& container,
     return result;
 }
 
-/**
- * Reports one duplication, two or more instances. Returns true if a report was
- * made, false if no big enough duplication could be found.
- */
-static bool reportOne(BookmarkContainer& container,
-                      const Options&     options,
-                      const char*        processedEnd,
-                      int&               totalDuplication)
+static int expandSearch(const BookmarkContainer& container,
+                        Duplication&             duplication,
+                        int                      almostLongest,
+                        int                      startingPoint,
+                        int                      loopIncrement)
 {
-    Duplication worst = findWorst(container, options, processedEnd);
-    if (worst.instances == 0)
-        return false;
-
-    // Report all found instances (exact and approximate matches).
-    for (int i = 0; i < worst.instances; ++i)
+    int steps = 0;
+    for (int i = duplication.indexOf1stInstance + startingPoint;
+         i >= 0 && i < int(container.size()) && not container.isCleared(i);
+         i += loopIncrement)
     {
-        container.report(worst.indexOf1stInstance + i, worst.longestSame,
-                         i + 1, options.isVerbose && i == worst.instances - 1,
-                         options.wordMode);
-    }
-    cout << std::endl;
-
-    totalDuplication += worst.longestSame * worst.instances;
-
-    // Clear bookmarks that point to something within the reported area.
-    // This is to avoid reporting the same section more than once.
-    container.clearWithin(worst.indexOf1stInstance, worst.longestSame,
-                          worst.instances);
-    return true;
-}
-
-/*-----------------------------------------------------------------------------
- * Main
- *---------------------------------------------------------------------------*/
-
-int main(int argc, char* argv[])
-{
-    BookmarkContainer container;
-
-    if (argc == 1)
-        Options::printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_SUCCESS);
-
-    Options options(argc, argv);
-
-    if (Bookmark::totalLength() == 0)
-        Options::printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_FAILURE);
-
-    const char* processed        = Parser::process(container,
-                                                   options.wordMode);
-    const char* processedEnd     = processed + strlen(processed);
-    int         totalDuplication = 0;
-
-    container.sort();
-
-    for (int count = 0; count < options.nrOfWantedReports; ++count)
-    {
-        if (not reportOne(container, options, processedEnd, totalDuplication))
+        const int same = container.nrOfSame(duplication.indexOf1stInstance, i);
+        if (same < almostLongest)
             break;
+        steps++;
+        if (duplication.longestSame > same)
+            duplication.longestSame = same;
     }
-
-    if (options.totalReport != Options::NO_TOTAL)
-    {
-        const int length = processedEnd - processed;
-        cout << "Duplication = " << Bookmark::getTotalNrOfLines() << " lines, "
-             << (100 * totalDuplication + length / 2) / length << " %\n";
-    }
-    delete [] processed;
-    return 0;
+    return steps;
 }
