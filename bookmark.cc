@@ -92,11 +92,9 @@ Bookmark::sameAs(Bookmark b, int aNrOfCharacters, const char* anEnd) const
     return true;
 }
 
-void Bookmark::addFile(const char* fileName)
+void Bookmark::addFile(const std::string& fileName)
 {
-    if (fileName)
-        totalString += readFileIntoString(fileName);
-
+    totalString += readFileIntoString(fileName.c_str());
     fileRecords.push_back(FileRecord(fileName, totalString.length()));
 }
 

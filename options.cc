@@ -63,7 +63,7 @@ int Options::processFlag(int i, int argc, char* argv[])
             if (!isRestrictedTotal ||
                 foundFiles[ii].find("test") == string::npos)
             {
-                Bookmark::addFile(foundFiles[ii].c_str());
+                Bookmark::addFile(foundFiles[ii]);
             }
         }
         break;

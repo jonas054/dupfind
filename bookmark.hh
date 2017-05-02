@@ -8,8 +8,8 @@ class Bookmark
 {
     struct FileRecord
     {
-        FileRecord(const char* n, int i): fileName(n), endIx(i) {}
-        const char* fileName;
+        FileRecord(const std::string& n, int i): fileName(n), endIx(i) {}
+        std::string fileName;
         int         endIx; // Position right after the final char of the file.
     };
 
@@ -42,7 +42,7 @@ public:
 
     static int getTotalNrOfLines() { return totalNrOfLines; }
 
-    static void addFile(const char* fileName);
+    static void addFile(const std::string& fileName);
 
     static size_t totalLength() { return totalString.length(); }
 

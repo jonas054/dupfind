@@ -125,8 +125,6 @@ int main(int argc, char* argv[])
     if (Bookmark::totalLength() == 0)
         Options::printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_FAILURE);
 
-    Bookmark::addFile(0); // Mark end
-
     const char* processed        = Parser::process(container,
                                                    options.wordMode);
     const char* processedEnd     = processed + strlen(processed);
