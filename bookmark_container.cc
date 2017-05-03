@@ -1,5 +1,6 @@
 #include "bookmark.hh"
 #include "bookmark_container.hh"
+#include "duplication.hh"
 
 #include <algorithm> // stable_sort, remove_if, mem_fun_ref
 
@@ -41,17 +42,15 @@ void BookmarkContainer::sort()
     std::stable_sort(bookmarks.begin(), bookmarks.end());
 }
 
-void BookmarkContainer::clearWithin(int indexOf1stInstance,
-                                    int longestSame,
-                                    int instances)
+void BookmarkContainer::clearWithin(const Duplication& d)
 {
-    for (int i = 0; i < instances; ++i)
+    for (int i = 0; i < d.instances; ++i)
     {
-        const char* reportStart = bookmarks[indexOf1stInstance + i].processed;
+        const char* reportStart = bookmarks[d.indexOf1stInstance + i].processed;
 
         for (size_t ix = 0; ix < bookmarks.size() - 1; ++ix)
             if (bookmarks[ix].processed >= reportStart &&
-                bookmarks[ix].processed < reportStart + longestSame)
+                bookmarks[ix].processed < reportStart + d.longestSame)
             {
                 bookmarks[ix].clear();
             }

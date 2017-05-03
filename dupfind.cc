@@ -64,8 +64,7 @@ bool Dupfind::reportOne()
 
     // Clear bookmarks that point to something within the reported area.
     // This is to avoid reporting the same section more than once.
-    itsContainer.clearWithin(worst.indexOf1stInstance, worst.longestSame,
-                             worst.instances);
+    itsContainer.clearWithin(worst);
     return true;
 }
 

@@ -25,7 +25,7 @@ public:
 
     void sort();
 
-    void clearWithin(int indexOf1stInstance, int longestSame, int instances);
+    void clearWithin(const Duplication& duplication);
 
 private:
     void getRidOfHoles();
