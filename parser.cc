@@ -12,11 +12,11 @@ using std::map;
  * Adds a character to the processed string and sets a bookmark, which is then
  * returned.
  */
-static Bookmark addChar(char c, int anOriginalIndex, char* aProcessedText)
+static Bookmark addChar(char c, int originalIndex, char* processedText)
 {
     static int procIx;
-    Bookmark bookmark(anOriginalIndex, &aProcessedText[procIx]);
-    aProcessedText[procIx++] = c;
+    Bookmark bookmark(originalIndex, &processedText[procIx]);
+    processedText[procIx++] = c;
     return bookmark;
 }
 

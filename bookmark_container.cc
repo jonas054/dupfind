@@ -8,12 +8,12 @@ void BookmarkContainer::addBookmark(const Bookmark& bm)
     bookmarks.push_back(bm);
 }
 
-void BookmarkContainer::report(int i,
+void BookmarkContainer::report(int                bookmarkIx,
                                const Duplication& duplication,
-                               int anInstanceNr,
-                               const Options& options) const
+                               int                instanceNr,
+                               const Options&     options) const
 {
-    bookmarks[i].report(duplication, anInstanceNr, options);
+    bookmarks[bookmarkIx].report(duplication, instanceNr, options);
 }
 
 size_t BookmarkContainer::size() const

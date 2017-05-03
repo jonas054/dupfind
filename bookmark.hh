@@ -24,7 +24,7 @@ public:
      * string.
      */
     void report(const Duplication& duplication,
-                int                anInstanceNr,
+                int                instanceNr,
                 const Options&     options) const;
 
     void clear() { this->processed = 0; }
@@ -40,7 +40,7 @@ public:
      * find out quickly if the two strings are not equal in the given number of
      * characters and move on to the next comparison.
      */
-    bool sameAs(Bookmark b, int aNrOfCharacters, const char* anEnd) const;
+    bool sameAs(Bookmark b, int nrOfCharacters, const char* end) const;
 
     static int getTotalNrOfLines() { return totalNrOfLines; }
 
@@ -56,9 +56,10 @@ private:
 
     enum DetailType { PRINT_LINES, COUNT_LINES };
 
-    int details(int aProcessedLength, DetailType  aType, bool wordMode) const;
+    int
+    details(int processedLength, DetailType detailType, bool wordMode) const;
 
-    static int lineNr(const char* aBase, int anOffset, int anIndex);
+    static int lineNr(const char* base, int offset, int index);
 
     static int                     totalNrOfLines;
     static std::vector<FileRecord> fileRecords;

@@ -14,19 +14,19 @@ using std::istream_iterator;
 // We use ASCII code 7 as a special value denoting EOF.
 const char SPECIAL_EOF = '\x7';
 
-extern string readFileIntoString(const char* aFileName)
+extern string readFileIntoString(const char* fileName)
 {
     struct stat s;
-    if ((stat(aFileName, &s) == 0) && (s.st_mode & S_IFDIR))
+    if ((stat(fileName, &s) == 0) && (s.st_mode & S_IFDIR))
     {
-        cerr << "dupfind: " << aFileName << " is a directory.\n";
+        cerr << "dupfind: " << fileName << " is a directory.\n";
         exit(EXIT_FAILURE);
     }
 
-    std::ifstream in(aFileName, ios::in);
+    std::ifstream in(fileName, ios::in);
     if (!in.good())
     {
-        cerr << "dupfind: File " << aFileName << " not found.\n";
+        cerr << "dupfind: File " << fileName << " not found.\n";
         exit(EXIT_FAILURE);
     }
     in.unsetf(ios::skipws);

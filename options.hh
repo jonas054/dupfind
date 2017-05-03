@@ -23,7 +23,7 @@ public:
 
     void parse(int argc, char* argv[]);
 
-    static void printUsageAndExit(ExtFlagMode anExtFlagMode, int anExitCode);
+    static void printUsageAndExit(ExtFlagMode extFlagMode, int exitCode);
 
 private:
     int processFlag(int i, int argc, char* argv[]);

@@ -12,9 +12,9 @@ class BookmarkContainer
 public:
     void addBookmark(const Bookmark& bm);
 
-    void report(int                i,
+    void report(int                bookmarkIx,
                 const Duplication& duplication,
-                int                anInstanceNr,
+                int                instanceNr,
                 const Options&     options) const;
 
     size_t size() const;
@@ -28,12 +28,6 @@ public:
     void clearWithin(int indexOf1stInstance, int longestSame, int instances);
 
 private:
-    /**
-     * Removes all bookmarks where the "processed" field is null while
-     * maintaining a sorted bookmark array. It uses a "two index fingers"
-     * algorithm looking for null bookmarks with the left index finger (dest)
-     * and for non-null bookmarks with the right index finger (source).
-     */
     void getRidOfHoles();
 
     std::vector<Bookmark> bookmarks;

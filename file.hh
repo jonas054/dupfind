@@ -5,6 +5,6 @@
 
 extern const char SPECIAL_EOF;
 
-extern std::string readFileIntoString(const char* aFileName);
+extern std::string readFileIntoString(const char* fileName);
 
 #endif
