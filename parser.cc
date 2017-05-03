@@ -167,7 +167,6 @@ const char* Parser::process(BookmarkContainer& container, bool wordMode)
         else if (state == NORMAL && not isspace(c))
         { // Handle state/event pair that can't be handled by The Matrix.
             if (timeForNewBookmark && c != '}')
-            {
                 if (c == '#' ||
                     strncmp("import", &Bookmark::getChar(i), 6) == 0 ||
                     strncmp("using",  &Bookmark::getChar(i), 5) == 0)
@@ -176,7 +175,6 @@ const char* Parser::process(BookmarkContainer& container, bool wordMode)
                 }
                 else
                     container.addBookmark(addChar(c, i, processed));
-            }
             else
                 addChar(c, i, processed);
 

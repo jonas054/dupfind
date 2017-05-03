@@ -186,15 +186,11 @@ void Options::printUsageAndExit(ExtFlagMode anExtFlagMode, int anExitCode)
        << " the given ending\n"
        << "              (several -e options can be given)\n";
     if (anExtFlagMode == SHOW_EXT_FLAGS)
-    {
         os << "       -p50:  use 50% proximity (more but shorter matches); "
            << "90% is default\n";
-    }
     os << "       -t:    set -m100 and sum up the total duplication\n";
     if (anExtFlagMode == SHOW_EXT_FLAGS)
-    {
         os << "       -T:    same as -t but accept any file (test code etc.)"
            << endl;
-    }
     exit(anExitCode);
 }

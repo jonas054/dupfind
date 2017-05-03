@@ -33,10 +33,8 @@ void Bookmark::report(int aNrOfSame,
          << order(anInstanceNr) << " instance";
     int nrOfLines = details(aNrOfSame, COUNT_LINES, wordMode);
     if (anInstanceNr == 1)
-    {
         cout << ", " << aNrOfSame << " characters, "
              << nrOfLines << " line" << (nrOfLines == 1 ? "" : "s");
-    }
     else
         totalNrOfLines += nrOfLines;
 
@@ -63,11 +61,9 @@ int Bookmark::nrOfSame(Bookmark b) const
 {
     int index = 0;
     for (; this->processed[index] == b.processed[index]; ++index)
-    {
         // The characters are equal so we only have to check one of them.
         if (this->processed[index] == SPECIAL_EOF)
             break;
-    }
     return index;
 }
 

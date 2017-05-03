@@ -30,10 +30,8 @@ int Dupfind::run(int argc, char* argv[])
     itsContainer.sort();
 
     for (int count = 0; count < itsOptions.nrOfWantedReports; ++count)
-    {
         if (not reportOne())
             break;
-    }
 
     if (itsOptions.totalReport != Options::NO_TOTAL)
     {
@@ -57,12 +55,10 @@ bool Dupfind::reportOne()
 
     // Report all found instances (exact and approximate matches).
     for (int i = 0; i < worst.instances; ++i)
-    {
         itsContainer.report(worst.indexOf1stInstance + i, worst.longestSame,
                             i + 1,
                             itsOptions.isVerbose && i == worst.instances - 1,
                             itsOptions.wordMode);
-    }
     cout << std::endl;
 
     itsTotalDuplication += worst.longestSame * worst.instances;
@@ -80,7 +76,6 @@ Dupfind::Duplication Dupfind::findWorst() const
 
     // Find the two bookmarks that have the longest common substring.
     for (size_t markIx = 0; markIx < itsContainer.size() - 1; ++markIx)
-    {
         if (itsContainer.same(markIx, markIx + 1, result.longestSame,
                               itsProcessedEnd))
         {
@@ -91,7 +86,6 @@ Dupfind::Duplication Dupfind::findWorst() const
                 result.longestSame        = same;
             }
         }
-    }
 
     if (result.longestSame >= itsOptions.minLength)
     {
