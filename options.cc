@@ -146,12 +146,12 @@ void Options::findFiles(const string&         dirName,
     closedir(dir);
 }
 
-void Options::processFileName(const char* arg)
+void Options::processFileName(const string& arg)
 {
     if (totalReport == RESTRICTED_TOTAL &&
-        (string(arg).find("test") != string::npos ||
-         (string(arg).find("_R") != string::npos &&
-          isdigit(arg[string(arg).find("_R") + 2]))))
+        (arg.find("test") != string::npos ||
+         (arg.find("_R") != string::npos &&
+          isdigit(arg[arg.find("_R") + 2]))))
     {
         cerr << "The file " << arg << " is not included in the total "
              << "duplication calculations. Use -T if you want to include it."
