@@ -110,7 +110,6 @@ int Bookmark::details(int        processedLength,
     int  count     = 1;
     bool blankLine = true;
     for (int pi = 0; pi < processedLength; ++pi, ++orig)
-    {
         for (; *orig != 0 && *orig != SPECIAL_EOF; ++orig)
         {
             if (detailType == PRINT_LINES)
@@ -133,18 +132,17 @@ int Bookmark::details(int        processedLength,
                 break;
             }
         }
-    }
     if (detailType == PRINT_LINES)
         cout << endl;
     return count;
 }
 
-int Bookmark::lineNr(const char* base, int offset, int index)
+int Bookmark::lineNr(int offset, int index)
 {
     const int start = (index == 0) ? 0 : fileRecords[index - 1].endIx;
     int result = 1;
     for (int i = start; i < offset; ++i)
-        if (base[i] == '\n')
+        if (Bookmark::totalString[i] == '\n')
             ++result;
     return result;
 }
@@ -156,6 +154,6 @@ std::ostream& operator<<(std::ostream& os, const Bookmark& b)
         ++recIx;
 
     os << Bookmark::fileRecords[recIx].fileName << ":"
-       << Bookmark::lineNr(Bookmark::totalString.c_str(), b.original, recIx);
+       << Bookmark::lineNr(b.original, recIx);
     return os;
 }

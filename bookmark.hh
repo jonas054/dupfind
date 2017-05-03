@@ -59,7 +59,7 @@ private:
     int
     details(int processedLength, DetailType detailType, bool wordMode) const;
 
-    static int lineNr(const char* base, int offset, int index);
+    static int lineNr(int offset, int index);
 
     static int                     totalNrOfLines;
     static std::vector<FileRecord> fileRecords;
