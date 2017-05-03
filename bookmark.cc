@@ -1,4 +1,6 @@
 #include "bookmark.hh"
+#include "options.hh"
+#include "duplication.hh"
 #include "file.hh" // readFileIntoString
 
 #include <iostream>   // cout, endl, ostream
@@ -19,10 +21,9 @@ std::string                       Bookmark::totalString;
  * Reports one instance of duplication and optionally prints the duplicated
  * string.
  */
-void Bookmark::report(int aNrOfSame,
+void Bookmark::report(const Duplication& duplication,
                       int anInstanceNr,
-                      bool isVerbose_,
-                      bool wordMode) const
+                      const Options& options) const
 {
     static int count = 0;
 
@@ -31,16 +32,16 @@ void Bookmark::report(int aNrOfSame,
 
     cout << *this << ":Duplication " << count << " (" << anInstanceNr
          << order(anInstanceNr) << " instance";
-    int nrOfLines = details(aNrOfSame, COUNT_LINES, wordMode);
+    int nrOfLines = details(duplication.longestSame, COUNT_LINES, options.wordMode);
     if (anInstanceNr == 1)
-        cout << ", " << aNrOfSame << " characters, "
+        cout << ", " << duplication.longestSame << " characters, "
              << nrOfLines << " line" << (nrOfLines == 1 ? "" : "s");
     else
         totalNrOfLines += nrOfLines;
 
     cout << ")." << endl;
-    if (isVerbose_)
-        details(aNrOfSame, PRINT_LINES, wordMode);
+    if (options.isVerbose && anInstanceNr == duplication.instances)
+        details(duplication.longestSame, PRINT_LINES, options.wordMode);
 }
 
 // Returns the correct suffix for strings like 1st, 2nd, 3rd, 4th, etc.

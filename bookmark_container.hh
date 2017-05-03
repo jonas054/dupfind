@@ -4,17 +4,18 @@
 #include <vector>
 
 class Bookmark;
+class Options;
+struct Duplication;
 
 class BookmarkContainer
 {
 public:
     void addBookmark(const Bookmark& bm);
 
-    void report(int i,
-                int aNrOfSame,
-                int anInstanceNr,
-                bool isVerbose_,
-                bool wordMode) const;
+    void report(int                i,
+                const Duplication& duplication,
+                int                anInstanceNr,
+                const Options&     options) const;
 
     size_t size() const;
 

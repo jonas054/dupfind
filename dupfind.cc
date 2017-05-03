@@ -13,6 +13,7 @@
 #include <cstring>    // strlen
 
 #include "dupfind.hh"
+#include "duplication.hh"
 #include "bookmark.hh"
 #include "bookmark_container.hh"
 #include "options.hh"
@@ -55,10 +56,8 @@ bool Dupfind::reportOne()
 
     // Report all found instances (exact and approximate matches).
     for (int i = 0; i < worst.instances; ++i)
-        itsContainer.report(worst.indexOf1stInstance + i, worst.longestSame,
-                            i + 1,
-                            itsOptions.isVerbose && i == worst.instances - 1,
-                            itsOptions.wordMode);
+        itsContainer.report(worst.indexOf1stInstance + i, worst, i + 1,
+                            itsOptions);
     cout << std::endl;
 
     itsTotalDuplication += worst.longestSame * worst.instances;
@@ -70,7 +69,7 @@ bool Dupfind::reportOne()
     return true;
 }
 
-Dupfind::Duplication Dupfind::findWorst() const
+Duplication Dupfind::findWorst() const
 {
     Duplication result;
 

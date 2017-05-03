@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+struct Duplication;
+class Options;
+
 class Bookmark
 {
     struct FileRecord
@@ -20,10 +23,9 @@ public:
      * Reports one instance of duplication and optionally prints the duplicated
      * string.
      */
-    void report(int aNrOfSame,
-                int anInstanceNr,
-                bool isVerbose_,
-                bool wordMode) const;
+    void report(const Duplication& duplication,
+                int                anInstanceNr,
+                const Options&     options) const;
 
     void clear() { this->processed = 0; }
 

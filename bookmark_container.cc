@@ -9,12 +9,11 @@ void BookmarkContainer::addBookmark(const Bookmark& bm)
 }
 
 void BookmarkContainer::report(int i,
-                               int aNrOfSame,
+                               const Duplication& duplication,
                                int anInstanceNr,
-                               bool isVerbose_,
-                               bool wordMode) const
+                               const Options& options) const
 {
-    bookmarks[i].report(aNrOfSame, anInstanceNr, isVerbose_, wordMode);
+    bookmarks[i].report(duplication, anInstanceNr, options);
 }
 
 size_t BookmarkContainer::size() const
