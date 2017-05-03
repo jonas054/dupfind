@@ -7,6 +7,11 @@
 struct Duplication;
 class Options;
 
+/**
+ * A bookmark is something that points at a position in the processed
+ * text while also keeping track of the corresponding position in the
+ * file where the text originally came from.
+ */
 class Bookmark
 {
     struct FileRecord
@@ -27,12 +32,19 @@ public:
                 int                instanceNr,
                 const Options&     options) const;
 
+    /**
+     * Clear the bookmark, i.e. mark it for deletion.
+     */
     void clear() { this->processed = 0; }
 
     bool isCleared() const { return this->processed == 0; }
 
     bool operator<(const Bookmark& another) const; // Used in sorting.
 
+    /**
+     * How many characters are equal when comparing the bookmark to
+     * another bookmark?
+     */
     int nrOfSame(Bookmark b) const;
 
     /**
