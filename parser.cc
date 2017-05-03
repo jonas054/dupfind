@@ -32,38 +32,39 @@ const char* Parser::process(BookmarkContainer& bc, bool wordMode)
 
     processed = new char[Bookmark::totalLength()];
 
+    State state = NORMAL;
     for (size_t i = 0; i < Bookmark::totalLength(); ++i)
-        processChar(matrix, i);
+        state = processChar(state, matrix, i);
 
     addChar('\0', Bookmark::totalLength());
 
     return processed;
 }
 
-void Parser::processChar(const map<Key, Value>& matrix,
-                         size_t                 i)
+Parser::State Parser::processChar(State                  state,
+                                  const map<Key, Value>& matrix,
+                                  size_t                 i)
 {
     const char c = Bookmark::getChar(i);
     // Apparently there can be zeroes in the total string, but only when
     // running on some machines. Don't know why.
     if (c == '\0')
-        return;
+        return state;
 
     if (c == SPECIAL_EOF)
     {
         addChar(c, i);
-        state = NORMAL;
-        return;
+        return NORMAL;
     }
 
     map<Key, Value>::const_iterator it;
     if ((it = matrix.find(Key(state, c)))   != matrix.end() ||
         (it = matrix.find(Key(state, ANY))) != matrix.end())
     {
-        state = it->second.newState;
         performAction(it->second.action, c, i);
+        return it->second.newState;
     }
-    else if (state == NORMAL && not isspace(c))
+    if (state == NORMAL && not isspace(c))
     { // Handle state/event pair that can't be handled by The Matrix.
         if (timeForNewBookmark && c != '}')
             if (c == '#' ||
@@ -79,6 +80,7 @@ void Parser::processChar(const map<Key, Value>& matrix,
 
         timeForNewBookmark = false;
     }
+    return state;
 }
 
 void Parser::performAction(Action action, char c, size_t i)

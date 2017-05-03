@@ -35,19 +35,19 @@ class Parser
     };
 
 public:
-    Parser(): state(NORMAL), timeForNewBookmark(true) {}
+    Parser(): timeForNewBookmark(true) {}
 
     const char* process(BookmarkContainer& container, bool wordMode);
 
-    void processChar(const std::map<Key, Value>& matrix, size_t i);
-
 private:
+    State       processChar(State                       state,
+                            const std::map<Key, Value>& matrix,
+                            size_t                      i);
     void        performAction(Action action, char c, size_t i);
     Bookmark    addChar(char c, int originalIndex);
     const Cell* codeBehavior() const;
     const Cell* textBehavior() const;
 
-    State              state;
     bool               timeForNewBookmark;
     BookmarkContainer* container;
     char*              processed;
