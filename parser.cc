@@ -8,47 +8,126 @@
 
 using std::map;
 
+static const char ANY = '\0';
+
+/**
+ * Reads the original text into a processed text, which is returned. Also sets
+ * the bookmarks to point into the two strings.
+ */
+const char* Parser::process(BookmarkContainer& bc, bool wordMode)
+{
+    container = &bc;
+
+    map<Key, Value> matrix;
+    const Cell* cells = wordMode ? textBehavior() : codeBehavior();
+
+    for (int i = 0; cells[i].oldState != NO_STATE; ++i)
+    {
+        Key k(cells[i].oldState, cells[i].event);
+        Value v;
+        v.newState = cells[i].newState;
+        v.action   = cells[i].action;
+        matrix[k] = v;
+    }
+
+    processed = new char[Bookmark::totalLength()];
+
+    for (size_t i = 0; i < Bookmark::totalLength(); ++i)
+        processChar(matrix, i);
+
+    addChar('\0', Bookmark::totalLength());
+
+    return processed;
+}
+
+void Parser::processChar(const map<Key, Value>& matrix,
+                         size_t                 i)
+{
+    const char c = Bookmark::getChar(i);
+    // Apparently there can be zeroes in the total string, but only when
+    // running on some machines. Don't know why.
+    if (c == '\0')
+        return;
+
+    if (c == SPECIAL_EOF)
+    {
+        addChar(c, i);
+        state = NORMAL;
+        return;
+    }
+
+    map<Key, Value>::const_iterator it;
+    if ((it = matrix.find(Key(state, c)))   != matrix.end() ||
+        (it = matrix.find(Key(state, ANY))) != matrix.end())
+    {
+        state = it->second.newState;
+        performAction(it->second.action, c, i);
+    }
+    else if (state == NORMAL && not isspace(c))
+    { // Handle state/event pair that can't be handled by The Matrix.
+        if (timeForNewBookmark && c != '}')
+            if (c == '#' ||
+                strncmp("import", &Bookmark::getChar(i), 6) == 0 ||
+                strncmp("using",  &Bookmark::getChar(i), 5) == 0)
+            {
+                state = SKIP_TO_EOL;
+            }
+            else
+                container->addBookmark(addChar(c, i));
+        else
+            addChar(c, i);
+
+        timeForNewBookmark = false;
+    }
+}
+
+void Parser::performAction(Action action, char c, size_t i)
+{
+    switch (action)
+    {
+    case ADD_SLASH_AND_CHAR:
+        addChar('/', i-1);
+        if (not isspace(c))
+            addChar(c, i);
+        break;
+    case ADD_CHAR:
+    {
+        const Bookmark bm = addChar(c, i);
+        if (timeForNewBookmark)
+        {
+            container->addBookmark(bm);
+            timeForNewBookmark = false;
+        }
+        break;
+    }
+    case ADD_BOOKMARK:
+        timeForNewBookmark = true;
+        break;
+    case ADD_SPACE:
+        addChar(' ', i);
+        container->addBookmark(addChar(c, i));
+        break;
+    case NA:
+        break;
+    }
+}
+
 /**
  * Adds a character to the processed string and sets a bookmark, which is then
  * returned.
  */
-static Bookmark addChar(char c, int originalIndex, char* processedText)
+Bookmark Parser::addChar(char c, int originalIndex)
 {
     static int procIx;
-    Bookmark bookmark(originalIndex, &processedText[procIx]);
-    processedText[procIx++] = c;
+    Bookmark bookmark(originalIndex, &processed[procIx]);
+    processed[procIx++] = c;
     return bookmark;
 }
 
-enum State
+const Parser::Cell* Parser::codeBehavior() const
 {
-    NORMAL, COMMENT_START, C_COMMENT, C_COMMENT_END, DOUBLE_QUOTE,
-    SINGLE_QUOTE, ESCAPE_DOUBLE, ESCAPE_SINGLE, SKIP_TO_EOL, SPACE, NO_STATE
-};
-
-enum Action { NA, ADD_CHAR, ADD_SLASH_AND_CHAR, ADD_BOOKMARK, ADD_SPACE };
-
-struct Cell { State oldState; char event; State newState; Action action; };
-
-struct Key
-{
-    Key(State s, char e): oldState(s), event(e) {}
-    bool operator<(const Key& k) const
-    {
-        return (oldState < k.oldState ? true :
-                oldState > k.oldState ? false :
-                event < k.event);
-    }
-    State oldState;
-    char  event;
-};
-
-struct Value { State newState; Action action; };
-
-static const char ANY = '\0';
-
-static Cell codeBehavior[] =
-    { //  oldState       event newState       action
+    static Cell c[] = {
+        // oldState      event newState       action
         { NORMAL,        '/',  COMMENT_START, NA                 },
         { NORMAL,        '"',  DOUBLE_QUOTE,  ADD_CHAR           },
         { NORMAL,        '\'', SINGLE_QUOTE,  ADD_CHAR           },
@@ -78,9 +157,13 @@ static Cell codeBehavior[] =
 
         { NO_STATE,      ANY,  NO_STATE,      NA                 }
     };
+    return c;
+}
 
-static Cell textBehavior[] =
-    { //  oldState  event newState action
+const Parser::Cell* Parser::textBehavior() const
+{
+    static Cell c[] = {
+        // oldState event newState action
         { NORMAL,   ' ',  SPACE,    NA       },
         { NORMAL,   '\t', SPACE,    NA       },
         { NORMAL,   '\r', SPACE,    NA       },
@@ -97,91 +180,5 @@ static Cell textBehavior[] =
 
         { NO_STATE, ANY,  NO_STATE, NA        }
     };
-
-/**
- * Reads the original text into a processed text, which is returned. Also sets
- * the bookmarks to point into the two strings.
- */
-const char* Parser::process(BookmarkContainer& container, bool wordMode)
-{
-    map<Key, Value> matrix;
-    Cell* cells = wordMode ? textBehavior : codeBehavior;
-
-    for (int i = 0; cells[i].oldState != NO_STATE; ++i)
-    {
-        Key k(cells[i].oldState, cells[i].event);
-        Value v;
-        v.newState = cells[i].newState;
-        v.action   = cells[i].action;
-        matrix[k] = v;
-    }
-
-    State       state              = NORMAL;
-    char* const processed          = new char[Bookmark::totalLength()];
-    bool        timeForNewBookmark = true;
-
-    for (size_t i = 0; i < Bookmark::totalLength(); ++i)
-    {
-        const char c = Bookmark::getChar(i);
-
-        // Apparently there can be zeroes in the total string, but only when
-        // running on some machines. Don't know why.
-        if (c == '\0')
-            continue;
-
-        if (c == SPECIAL_EOF)
-        {
-            addChar(c, i, processed);
-            state = NORMAL;
-            continue;
-        }
-
-        map<Key, Value>::iterator it;
-        if ((it = matrix.find(Key(state, c)))   != matrix.end() ||
-            (it = matrix.find(Key(state, ANY))) != matrix.end())
-        {
-            state = it->second.newState;
-            if (it->second.action == ADD_SLASH_AND_CHAR)
-            {
-                addChar('/', i-1, processed);
-                if (not isspace(c))
-                    addChar(c, i, processed);
-            }
-            else if (it->second.action == ADD_CHAR)
-            {
-                const Bookmark bm = addChar(c, i, processed);
-                if (timeForNewBookmark)
-                {
-                    container.addBookmark(bm);
-                    timeForNewBookmark = false;
-                }
-            }
-            else if (it->second.action == ADD_BOOKMARK)
-                timeForNewBookmark = true;
-            else if (it->second.action == ADD_SPACE)
-            {
-                addChar(' ', i, processed);
-                container.addBookmark(addChar(c, i, processed));
-            }
-        }
-        else if (state == NORMAL && not isspace(c))
-        { // Handle state/event pair that can't be handled by The Matrix.
-            if (timeForNewBookmark && c != '}')
-                if (c == '#' ||
-                    strncmp("import", &Bookmark::getChar(i), 6) == 0 ||
-                    strncmp("using",  &Bookmark::getChar(i), 5) == 0)
-                {
-                    state = SKIP_TO_EOL;
-                }
-                else
-                    container.addBookmark(addChar(c, i, processed));
-            else
-                addChar(c, i, processed);
-
-            timeForNewBookmark = false;
-        }
-    }
-    addChar('\0', Bookmark::totalLength(), processed);
-
-    return processed;
+    return c;
 }
