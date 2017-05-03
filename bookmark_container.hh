@@ -18,8 +18,6 @@ public:
 
     size_t size() const;
 
-    bool isCleared(int i) const;
-
     bool same(int a, int b, int longestSame, const char* processedEnd) const;
 
     int nrOfSame(int a, int b) const;

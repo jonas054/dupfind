@@ -22,11 +22,6 @@ size_t BookmarkContainer::size() const
     return bookmarks.size();
 }
 
-bool BookmarkContainer::isCleared(int i) const
-{
-    return bookmarks[i].isCleared();
-}
-
 bool BookmarkContainer::same(int a,
                              int b,
                              int longestSame,
