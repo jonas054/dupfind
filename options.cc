@@ -178,7 +178,8 @@ void Options::printUsageAndExit(ExtFlagMode extFlagMode, int exitCode)
        << " characters long\n"
        << "       -x:    exclude paths matching substring when searching for"
        << " files with -e\n"
-       << "              (-x must come before the -e option it applies to)\n"
+       << "              (several -x options can be given and -x must come before the -e"
+       << "              option it applies to)\n"
        << "       -e:    search recursively for files whose names end with"
        << " the given ending\n"
        << "              (several -e options can be given)\n";

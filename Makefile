@@ -31,12 +31,14 @@ clean:
 
 README.md: $(PROGRAM)
 	./$(PROGRAM) -h 2>&1 | $(DOS2UNIX) > help.txt
-	awk '/# Usage/{flag=1;print;next} { if (!flag) print }' $@ > $@.new
-	mv $@.new $@
+	awk '/# Usage/{flag=1;print;next} { if (!flag) print }' $@ > $@.1
+	awk '/# Description/{flag=1; print ""} { if (flag) print }' $@ > $@.2
+	mv $@.1 $@
 	echo "\`\`\`" >> $@
 	sed 's/^Usage: /       /' help.txt >> $@
 	echo "\`\`\`" >> $@
-	rm help.txt
+	cat $@.2 >> $@
+	rm $@.2 help.txt
 
 define testcase
 	echo $(1)":" $(PROGRAM) $(2) $(3)
