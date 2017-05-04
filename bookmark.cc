@@ -13,9 +13,9 @@ using std::endl;
 
 static const char* order(int);
 
-int                               Bookmark::totalNrOfLines = 0;
-std::vector<Bookmark::FileRecord> Bookmark::fileRecords;
-std::string                       Bookmark::totalString;
+int                               Bookmark::theirTotalNrOfLines = 0;
+std::vector<Bookmark::FileRecord> Bookmark::theirFileRecords;
+std::string                       Bookmark::theirTotalString;
 
 /**
  * Reports one instance of duplication and optionally prints the duplicated
@@ -38,7 +38,7 @@ void Bookmark::report(const Duplication& duplication,
         cout << ", " << duplication.longestSame << " characters, "
              << nrOfLines << " line" << (nrOfLines == 1 ? "" : "s");
     else
-        totalNrOfLines += nrOfLines;
+        theirTotalNrOfLines += nrOfLines;
 
     cout << ")." << endl;
     if (options.isVerbose && instanceNr == duplication.instances)
@@ -56,15 +56,15 @@ static const char* order(int nr)
 
 bool Bookmark::operator<(const Bookmark& another) const // Used in sorting.
 {
-    return strcmp(another.processed, this->processed) < 0;
+    return strcmp(another.itsProcessedText, itsProcessedText) < 0;
 }
 
 int Bookmark::nrOfSame(Bookmark b) const
 {
     int index = 0;
-    for (; this->processed[index] == b.processed[index]; ++index)
+    for (; itsProcessedText[index] == b.itsProcessedText[index]; ++index)
         // The characters are equal so we only have to check one of them.
-        if (this->processed[index] == SPECIAL_EOF)
+        if (itsProcessedText[index] == SPECIAL_EOF)
             break;
     return index;
 }
@@ -77,14 +77,14 @@ int Bookmark::nrOfSame(Bookmark b) const
 bool
 Bookmark::sameAs(Bookmark b, int nrOfCharacters, const char* end) const
 {
-    if (&this->processed[nrOfCharacters] >= end ||
-        &b.processed[nrOfCharacters] >= end)
+    if (&itsProcessedText[nrOfCharacters] >= end ||
+        &b.itsProcessedText[nrOfCharacters] >= end)
     {
         return false;
     }
 
     for (int i = nrOfCharacters; i >= 0; --i)
-        if (this->processed[i] != b.processed[i])
+        if (itsProcessedText[i] != b.itsProcessedText[i])
             return false;
 
     return true;
@@ -92,18 +92,19 @@ Bookmark::sameAs(Bookmark b, int nrOfCharacters, const char* end) const
 
 void Bookmark::addFile(const std::string& fileName)
 {
-    totalString += readFileIntoString(fileName.c_str());
-    fileRecords.push_back(FileRecord(fileName, totalString.length()));
+    theirTotalString += readFileIntoString(fileName.c_str());
+    theirFileRecords.push_back(FileRecord(fileName,
+                                          theirTotalString.length()));
 }
 
 int Bookmark::details(int        processedLength,
                       DetailType detailType,
                       bool       wordMode) const
 {
-    const char* orig = totalString.c_str() + this->original;
+    const char* orig = theirTotalString.c_str() + itsOriginalIndex;
     if (not wordMode)
     {
-        while (orig > totalString.c_str() && *orig != '\n')
+        while (orig > theirTotalString.c_str() && *orig != '\n')
             --orig; // to include leading whitespace in printout
         ++orig;
     }
@@ -126,8 +127,8 @@ int Bookmark::details(int        processedLength,
                 blankLine = false;
             // In word mode, a space in the processed text means any kind of
             // space, so we can not continue to search for an exact match.
-            if (*orig == this->processed[pi] ||
-                (isspace(this->processed[pi]) && isspace(*orig)))
+            if (*orig == itsProcessedText[pi] ||
+                (isspace(itsProcessedText[pi]) && isspace(*orig)))
             {
                 break;
             }
@@ -139,10 +140,10 @@ int Bookmark::details(int        processedLength,
 
 int Bookmark::lineNr(int offset, int index)
 {
-    const int start = (index == 0) ? 0 : fileRecords[index - 1].endIx;
+    const int start = (index == 0) ? 0 : theirFileRecords[index - 1].endIx;
     int result = 1;
     for (int i = start; i < offset; ++i)
-        if (Bookmark::totalString[i] == '\n')
+        if (Bookmark::theirTotalString[i] == '\n')
             ++result;
     return result;
 }
@@ -150,10 +151,10 @@ int Bookmark::lineNr(int offset, int index)
 std::ostream& operator<<(std::ostream& os, const Bookmark& b)
 {
     int recIx = 0;
-    while (Bookmark::fileRecords[recIx].endIx <= b.original)
+    while (Bookmark::theirFileRecords[recIx].endIx <= b.itsOriginalIndex)
         ++recIx;
 
-    os << Bookmark::fileRecords[recIx].fileName << ":"
-       << Bookmark::lineNr(b.original, recIx);
+    os << Bookmark::theirFileRecords[recIx].fileName << ":"
+       << Bookmark::lineNr(b.itsOriginalIndex, recIx);
     return os;
 }

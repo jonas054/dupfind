@@ -6,7 +6,7 @@
 
 void BookmarkContainer::addBookmark(const Bookmark& bm)
 {
-    bookmarks.push_back(bm);
+    itsBookmarks.push_back(bm);
 }
 
 void BookmarkContainer::report(int                bookmarkIx,
@@ -14,12 +14,12 @@ void BookmarkContainer::report(int                bookmarkIx,
                                int                instanceNr,
                                const Options&     options) const
 {
-    bookmarks[bookmarkIx].report(duplication, instanceNr, options);
+    itsBookmarks[bookmarkIx].report(duplication, instanceNr, options);
 }
 
 size_t BookmarkContainer::size() const
 {
-    return bookmarks.size();
+    return itsBookmarks.size();
 }
 
 bool BookmarkContainer::same(int a,
@@ -27,45 +27,47 @@ bool BookmarkContainer::same(int a,
                              int longestSame,
                              const char* processedEnd) const
 {
-    return bookmarks[a].sameAs(bookmarks[b], longestSame, processedEnd);
+    return itsBookmarks[a].sameAs(itsBookmarks[b], longestSame, processedEnd);
 }
 
 int BookmarkContainer::nrOfSame(int a, int b) const
 {
-    return bookmarks[a].nrOfSame(bookmarks[b]);
+    return itsBookmarks[a].nrOfSame(itsBookmarks[b]);
 }
 
 void BookmarkContainer::sort()
 {
     // std::stable_sort(), which is a merge sort, has proved to be much faster
     // than std::sort() in this context.
-    std::stable_sort(bookmarks.begin(), bookmarks.end());
+    std::stable_sort(itsBookmarks.begin(), itsBookmarks.end());
 }
 
 void BookmarkContainer::clearWithin(const Duplication& d)
 {
     for (int i = 0; i < d.instances; ++i)
     {
-        const char* reportStart = bookmarks[d.indexOf1stInstance + i].processed;
+        const char* reportStart =
+          itsBookmarks[d.indexOf1stInstance + i].itsProcessedText;
 
-        for (size_t ix = 0; ix < bookmarks.size() - 1; ++ix)
-            if (bookmarks[ix].processed >= reportStart &&
-                bookmarks[ix].processed < reportStart + d.longestSame)
+        for (size_t ix = 0; ix < itsBookmarks.size() - 1; ++ix)
+            if (itsBookmarks[ix].itsProcessedText >= reportStart &&
+                itsBookmarks[ix].itsProcessedText <
+                reportStart + d.longestSame)
             {
-                bookmarks[ix].clear();
+                itsBookmarks[ix].clear();
             }
     }
     getRidOfHoles();
 }
 
 /**
- * Removes all bookmarks where the "processed" field is null while maintaining
- * a sorted bookmark array.
+ * Removes all bookmarks where the "itsProcessedText" field is null while
+ * maintaining a sorted bookmark array.
  */
 void BookmarkContainer::getRidOfHoles()
 {
     std::vector<Bookmark>::iterator newEnd =
-        std::remove_if(bookmarks.begin(), bookmarks.end(),
+        std::remove_if(itsBookmarks.begin(), itsBookmarks.end(),
                        std::mem_fun_ref(&Bookmark::isCleared));
-    bookmarks.resize(newEnd - bookmarks.begin());
+    itsBookmarks.resize(newEnd - itsBookmarks.begin());
 }

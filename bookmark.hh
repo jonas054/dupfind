@@ -22,7 +22,8 @@ class Bookmark
     };
 
 public:
-    Bookmark(int i = 0, const char* p = 0): original(i), processed(p) {}
+    Bookmark(int i = 0, const char* p = 0): itsOriginalIndex(i),
+                                            itsProcessedText(p) {}
 
     /**
      * Reports one instance of duplication and optionally prints the duplicated
@@ -35,9 +36,9 @@ public:
     /**
      * Clear the bookmark, i.e. mark it for deletion.
      */
-    void clear() { this->processed = 0; }
+    void clear() { itsProcessedText = 0; }
 
-    bool isCleared() const { return this->processed == 0; }
+    bool isCleared() const { return itsProcessedText == 0; }
 
     bool operator<(const Bookmark& another) const; // Used in sorting.
 
@@ -54,13 +55,13 @@ public:
      */
     bool sameAs(Bookmark b, int nrOfCharacters, const char* end) const;
 
-    static int getTotalNrOfLines() { return totalNrOfLines; }
+    static int getTotalNrOfLines() { return theirTotalNrOfLines; }
 
     static void addFile(const std::string& fileName);
 
-    static size_t totalLength() { return totalString.length(); }
+    static size_t totalLength() { return theirTotalString.length(); }
 
-    static const char& getChar(int i) { return totalString[i]; }
+    static const char& getChar(int i) { return theirTotalString[i]; }
 
 private:
     friend std::ostream& operator<<(std::ostream& os, const Bookmark& b);
@@ -73,12 +74,12 @@ private:
 
     static int lineNr(int offset, int index);
 
-    static int                     totalNrOfLines;
-    static std::vector<FileRecord> fileRecords;
-    static std::string             totalString;
+    static int                     theirTotalNrOfLines;
+    static std::vector<FileRecord> theirFileRecords;
+    static std::string             theirTotalString;
 
-    int         original;
-    const char* processed;
+    int         itsOriginalIndex;
+    const char* itsProcessedText;
 };
 
 #endif

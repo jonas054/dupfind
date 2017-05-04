@@ -16,7 +16,7 @@ static const char ANY = '\0';
  */
 const char* Parser::process(BookmarkContainer& bc, bool wordMode)
 {
-    container = &bc;
+    itsContainer = &bc;
 
     map<Key, Value> matrix;
     const Cell* cells = wordMode ? textBehavior() : codeBehavior();
@@ -30,7 +30,7 @@ const char* Parser::process(BookmarkContainer& bc, bool wordMode)
         matrix[k] = v;
     }
 
-    processed = new char[Bookmark::totalLength()];
+    itsProcessedText = new char[Bookmark::totalLength()];
 
     State state = NORMAL;
     for (size_t i = 0; i < Bookmark::totalLength(); ++i)
@@ -38,7 +38,7 @@ const char* Parser::process(BookmarkContainer& bc, bool wordMode)
 
     addChar('\0', Bookmark::totalLength());
 
-    return processed;
+    return itsProcessedText;
 }
 
 Parser::State Parser::processChar(State                  state,
@@ -74,7 +74,7 @@ Parser::State Parser::processChar(State                  state,
                 state = SKIP_TO_EOL;
             }
             else
-                container->addBookmark(addChar(c, i));
+                itsContainer->addBookmark(addChar(c, i));
         else
             addChar(c, i);
 
@@ -97,7 +97,7 @@ void Parser::performAction(Action action, char c, size_t i)
         const Bookmark bm = addChar(c, i);
         if (timeForNewBookmark)
         {
-            container->addBookmark(bm);
+            itsContainer->addBookmark(bm);
             timeForNewBookmark = false;
         }
         break;
@@ -107,7 +107,7 @@ void Parser::performAction(Action action, char c, size_t i)
         break;
     case ADD_SPACE:
         addChar(' ', i);
-        container->addBookmark(addChar(c, i));
+        itsContainer->addBookmark(addChar(c, i));
         break;
     case NA:
         break;
@@ -121,8 +121,8 @@ void Parser::performAction(Action action, char c, size_t i)
 Bookmark Parser::addChar(char c, int originalIndex)
 {
     static int procIx;
-    Bookmark bookmark(originalIndex, &processed[procIx]);
-    processed[procIx++] = c;
+    Bookmark bookmark(originalIndex, &itsProcessedText[procIx]);
+    itsProcessedText[procIx++] = c;
     return bookmark;
 }
 

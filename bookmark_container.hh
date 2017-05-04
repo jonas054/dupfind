@@ -30,7 +30,7 @@ public:
 private:
     void getRidOfHoles();
 
-    std::vector<Bookmark> bookmarks;
+    std::vector<Bookmark> itsBookmarks;
 };
 
 #endif

@@ -12,7 +12,8 @@ class Parser
     enum State
     {
         NORMAL, COMMENT_START, C_COMMENT, C_COMMENT_END, DOUBLE_QUOTE,
-        SINGLE_QUOTE, ESCAPE_DOUBLE, ESCAPE_SINGLE, SKIP_TO_EOL, SPACE, NO_STATE
+        SINGLE_QUOTE, ESCAPE_DOUBLE, ESCAPE_SINGLE, SKIP_TO_EOL, SPACE,
+        NO_STATE
     };
 
     enum Action { NA, ADD_CHAR, ADD_SLASH_AND_CHAR, ADD_BOOKMARK, ADD_SPACE };
@@ -49,8 +50,8 @@ private:
     const Cell* textBehavior() const;
 
     bool               timeForNewBookmark;
-    BookmarkContainer* container;
-    char*              processed;
+    BookmarkContainer* itsContainer;
+    char*              itsProcessedText;
 };
 
 #endif
