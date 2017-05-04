@@ -13,8 +13,8 @@ Duplication finder for source code and other text files
        -x:    exclude paths matching substring when searching for files with -e
               (several -x options can be given and -x must come before the -e
               option it applies to)
-       -e:    search recursively for files whose names end with the given ending
-              (several -e options can be given)
+       -e:    search recursively from the current directory for files whose
+              names end with the given ending (several -e options can be given)
        -p50:  use 50% proximity (more but shorter matches); 90% is default
        -t:    set -m100 and sum up the total duplication
        -T:    same as -t but accept any file (test code etc.)
@@ -22,8 +22,8 @@ Duplication finder for source code and other text files
 
 ## Description
 
-The design goal of dupfind is to be a simple generic copy paste detector for
-most programming languages and for other text files.
+The design goal of dupfind is to be a simple and very fast generic copy paste
+detector for most programming languages and for other text files.
 
 ## Modes
 
@@ -36,7 +36,7 @@ In normal mode, which is suited for analyzing source code, the analyzed files
 are read into memory and all white space and comments are removed from the
 text. The comment removal works for all programming languages that use either
 `/* ... */`, `// ...` or `# ...` as comments. This means that C, C++, C#, Java,
-and similar languages are fylly supported. Perl, Ruby, and Python are mostly
+and similar languages are fully supported. Perl, Ruby, and Python are mostly
 supported, but they also have other comment syntax that is not handled. Lisp
 and SQL and not supported when it comes to comments.
 

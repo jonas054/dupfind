@@ -8,8 +8,8 @@ Usage: dupfind [-v] [-w] [-<n>|-m<n>] [-p<n>] [-x <substring>] [-e <ending> ...]
        -x:    exclude paths matching substring when searching for files with -e
               (several -x options can be given and -x must come before the -e
               option it applies to)
-       -e:    search recursively for files whose names end with the given ending
-              (several -e options can be given)
+       -e:    search recursively from the current directory for files whose
+              names end with the given ending (several -e options can be given)
        -p50:  use 50% proximity (more but shorter matches); 90% is default
        -t:    set -m100 and sum up the total duplication
        -T:    same as -t but accept any file (test code etc.)

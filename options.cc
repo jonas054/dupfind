@@ -181,9 +181,10 @@ void Options::printUsageAndExit(ExtFlagMode extFlagMode, int exitCode)
        << "              (several -x options can be given and -x must come "
        << "before the -e\n"
        << "              option it applies to)\n"
-       << "       -e:    search recursively for files whose names end with"
-       << " the given ending\n"
-       << "              (several -e options can be given)\n";
+       << "       -e:    search recursively from the current directory for "
+       << "files whose\n"
+       << "              names end with the given ending (several -e options "
+       << "can be given)\n";
     if (extFlagMode == SHOW_EXT_FLAGS)
         os << "       -p50:  use 50% proximity (more but shorter matches); "
            << "90% is default\n";
