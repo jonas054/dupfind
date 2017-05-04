@@ -27,13 +27,8 @@ public:
 
 private:
     int processFlag(int i, int argc, char* argv[]);
-
     void processFileName(const std::string& arg);
-
-    void findFiles(const std::string&              name,
-                   const std::string&              ending,
-                   const std::vector<std::string>& excludes,
-                   std::vector<std::string>&       output);
+    void findFiles(const std::string& name, const std::string& ending);
 };
 
 #endif

@@ -66,7 +66,7 @@ int Options::processFlag(int i, int argc, char* argv[])
         for (int k = 1; !isRestrictedTotal && k < argc; ++k)
             if (argv[k][0] == '-' && argv[k][1] == 't')
                 isRestrictedTotal = true;
-        findFiles(".", argv[++i], excludes, foundFiles);
+        findFiles(".", argv[++i]);
         std::sort(foundFiles.begin(), foundFiles.end());
         for (size_t ii = 0; ii < foundFiles.size(); ++ii)
         {
@@ -114,10 +114,7 @@ int Options::processFlag(int i, int argc, char* argv[])
     return i;
 }
 
-void Options::findFiles(const string&         dirName,
-                        const string&         ending,
-                        const vector<string>& excludes,
-                        vector<string>&       output)
+void Options::findFiles(const string& dirName, const string& ending)
 {
     DIR* dir = opendir(dirName.c_str());
 
@@ -139,9 +136,9 @@ void Options::findFiles(const string&         dirName,
         if (path.length() > ending.length() &&
             path.substr(path.length() - ending.length()) == ending)
         {
-            output.push_back(path);
+            foundFiles.push_back(path);
         }
-        findFiles(path, ending, excludes, output);
+        findFiles(path, ending);
     }
     closedir(dir);
 }
