@@ -10,20 +10,6 @@
 using std::map;
 using std::string;
 
-struct Parser::Cell
-{
-    State  oldState;
-    char   event;
-    State  newState;
-    Action action;
-};
-
-struct Parser::Value
-{
-    State  newState;
-    Action action;
-};
-
 struct Parser::Key
 {
     Key(State s, char e): oldState(s), event(e) {}
@@ -37,6 +23,12 @@ struct Parser::Key
     char  event;
 };
 
+struct Parser::Value
+{
+    State  newState;
+    Action action;
+};
+
 static const char ANY = '\0';
 
 /**
@@ -45,17 +37,7 @@ static const char ANY = '\0';
  */
 const char* Parser::process(bool wordMode)
 {
-    map<Key, Value> matrix;
-    const Cell* cells = wordMode ? textBehavior() : codeBehavior();
-
-    for (int i = 0; cells[i].oldState != NO_STATE; ++i)
-    {
-        Key k(cells[i].oldState, cells[i].event);
-        Value v;
-        v.newState = cells[i].newState;
-        v.action   = cells[i].action;
-        matrix[k] = v;
-    }
+    const Matrix& matrix = wordMode ? textBehavior() : codeBehavior();
 
     itsProcessedText = new char[Bookmark::totalLength()];
 
@@ -73,9 +55,9 @@ static bool lookaheadIs(const string& s, int i)
     return strncmp(s.c_str(), &Bookmark::getChar(i), s.length()) == 0;
 }
 
-Parser::State Parser::processChar(State                  state,
-                                  const map<Key, Value>& matrix,
-                                  size_t                 i)
+Parser::State Parser::processChar(State         state,
+                                  const Matrix& matrix,
+                                  size_t        i)
 {
     static const string imports = "import";
     static const string usings = "using";
@@ -91,9 +73,9 @@ Parser::State Parser::processChar(State                  state,
         return NORMAL;
     }
 
-    map<Key, Value>::const_iterator it;
-    if ((it = matrix.find(Key(state, c)))   != matrix.end() ||
-        (it = matrix.find(Key(state, ANY))) != matrix.end())
+    Matrix::const_iterator it;
+    if ((it = matrix.find({ state, c }))   != matrix.end() ||
+        (it = matrix.find({ state, ANY })) != matrix.end())
     {
         performAction(it->second.action, c, i);
         return it->second.newState;
@@ -154,61 +136,61 @@ Bookmark Parser::addChar(char c, int originalIndex)
     return bookmark;
 }
 
-const Parser::Cell* Parser::codeBehavior() const
+const Parser::Matrix& Parser::codeBehavior() const
 {
-    static Cell c[] = {
-        // oldState      event newState       action
-        { NORMAL,        '/',  COMMENT_START, NA                 },
-        { NORMAL,        '"',  DOUBLE_QUOTE,  ADD_CHAR           },
-        { NORMAL,        '\'', SINGLE_QUOTE,  ADD_CHAR           },
-        { NORMAL,        '\n', NORMAL,        ADD_BOOKMARK       },
+    static Matrix m = {
+        //  oldState       event     newState       action
+        { { NORMAL,        '/'  }, { COMMENT_START, NA           } },
+        { { NORMAL,        '"'  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
+        { { NORMAL,        '\'' }, { SINGLE_QUOTE,  ADD_CHAR     } },
+        { { NORMAL,        '\n' }, { NORMAL,        ADD_BOOKMARK } },
         // See special handling of NORMAL in code further down.
 
-        { DOUBLE_QUOTE,  '\\', ESCAPE_DOUBLE, ADD_CHAR           },
-        { DOUBLE_QUOTE,  '"',  NORMAL,        ADD_CHAR           },
-        { DOUBLE_QUOTE,  ANY,  DOUBLE_QUOTE,  ADD_CHAR           },
-        { DOUBLE_QUOTE,  '\n', NORMAL,        ADD_BOOKMARK       }, // (1)
-        { SINGLE_QUOTE,  '\\', ESCAPE_SINGLE, ADD_CHAR           },
-        { SINGLE_QUOTE,  '\'', NORMAL,        ADD_CHAR           },
-        { SINGLE_QUOTE,  ANY,  SINGLE_QUOTE,  ADD_CHAR           },
-        { SINGLE_QUOTE,  '\n', NORMAL,        ADD_BOOKMARK       }, // (1)
-        { ESCAPE_SINGLE, ANY,  SINGLE_QUOTE,  ADD_CHAR           },
-        { ESCAPE_DOUBLE, ANY,  DOUBLE_QUOTE,  ADD_CHAR           },
+        { { DOUBLE_QUOTE,  '\\' }, { ESCAPE_DOUBLE, ADD_CHAR     } },
+        { { DOUBLE_QUOTE,  '"'  }, { NORMAL,        ADD_CHAR     } },
+        { { DOUBLE_QUOTE,  ANY  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
+        { { DOUBLE_QUOTE,  '\n' }, { NORMAL,        ADD_BOOKMARK } }, // (1)
+        { { SINGLE_QUOTE,  '\\' }, { ESCAPE_SINGLE, ADD_CHAR     } },
+        { { SINGLE_QUOTE,  '\'' }, { NORMAL,        ADD_CHAR     } },
+        { { SINGLE_QUOTE,  ANY  }, { SINGLE_QUOTE,  ADD_CHAR     } },
+        { { SINGLE_QUOTE,  '\n' }, { NORMAL,        ADD_BOOKMARK } }, // (1)
+        { { ESCAPE_SINGLE, ANY  }, { SINGLE_QUOTE,  ADD_CHAR     } },
+        { { ESCAPE_DOUBLE, ANY  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
         // (1) probably a mistake if quote reaches end-of-line.
 
-        { COMMENT_START, '*',  C_COMMENT,     NA                 },
-        { COMMENT_START, '/',  SKIP_TO_EOL,   NA                 },
-        { COMMENT_START, ANY,  NORMAL,        ADD_SLASH_AND_CHAR },
-        { SKIP_TO_EOL,   '\n', NORMAL,        ADD_BOOKMARK       },
-        { C_COMMENT,     '*',  C_COMMENT_END, NA                 },
-        { C_COMMENT_END, '/',  NORMAL,        NA                 },
-        { C_COMMENT_END, '*',  C_COMMENT_END, NA                 },
-        { C_COMMENT_END, ANY,  C_COMMENT,     NA                 },
+        { { COMMENT_START, '*'  }, { C_COMMENT,     NA                 } },
+        { { COMMENT_START, '/'  }, { SKIP_TO_EOL,   NA                 } },
+        { { COMMENT_START, ANY  }, { NORMAL,        ADD_SLASH_AND_CHAR } },
+        { { SKIP_TO_EOL,   '\n' }, { NORMAL,        ADD_BOOKMARK       } },
+        { { C_COMMENT,     '*'  }, { C_COMMENT_END, NA                 } },
+        { { C_COMMENT_END, '/'  }, { NORMAL,        NA                 } },
+        { { C_COMMENT_END, '*'  }, { C_COMMENT_END, NA                 } },
+        { { C_COMMENT_END, ANY  }, { C_COMMENT,     NA                 } },
 
-        { NO_STATE,      ANY,  NO_STATE,      NA                 }
+        { { NO_STATE,      ANY  }, { NO_STATE,      NA                 } }
     };
-    return c;
+    return m;
 }
 
-const Parser::Cell* Parser::textBehavior() const
+const Parser::Matrix& Parser::textBehavior() const
 {
-    static Cell c[] = {
-        // oldState event newState  action
-        { NORMAL,   ' ',  SPACE,    NA       },
-        { NORMAL,   '\t', SPACE,    NA       },
-        { NORMAL,   '\r', SPACE,    NA       },
-        { NORMAL,   '\n', SPACE,    NA       },
-        { NORMAL,   '', SPACE,    NA       },
-        { NORMAL,   ANY,  NORMAL,   ADD_CHAR },
+    static Matrix m = {
+        //  oldState  event     newState  action
+        { { NORMAL,   ' '  }, { SPACE,    NA       } },
+        { { NORMAL,   '\t' }, { SPACE,    NA       } },
+        { { NORMAL,   '\r' }, { SPACE,    NA       } },
+        { { NORMAL,   '\n' }, { SPACE,    NA       } },
+        { { NORMAL,   '' }, { SPACE,    NA       } },
+        { { NORMAL,   ANY  }, { NORMAL,   ADD_CHAR } },
 
-        { SPACE,    ' ',  SPACE,    NA        },
-        { SPACE,    '\t', SPACE,    NA        },
-        { SPACE,    '\r', SPACE,    NA        },
-        { SPACE,    '\n', SPACE,    NA        },
-        { SPACE,    '', SPACE,    NA        },
-        { SPACE,    ANY,  NORMAL,   ADD_SPACE },
-
-        { NO_STATE, ANY,  NO_STATE, NA        }
+        { { SPACE,    ' '  }, { SPACE,    NA        } },
+        { { SPACE,    '\t' }, { SPACE,    NA        } },
+        { { SPACE,    '\r' }, { SPACE,    NA        } },
+        { { SPACE,    '\n' }, { SPACE,    NA        } },
+        { { SPACE,    '' }, { SPACE,    NA        } },
+        { { SPACE,    ANY  }, { NORMAL,   ADD_SPACE } },
+ 
+        { { NO_STATE, ANY  }, { NO_STATE, NA        } }
     };
-    return c;
+    return m;
 }

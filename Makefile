@@ -1,6 +1,6 @@
 CXX      := g++
 CC       := $(CXX)
-CXXFLAGS := -W -Wall -O2 -g
+CXXFLAGS := -W -Wall -O2 -g --std=c++11
 ifeq ($(OS),Windows_NT)
 PROGRAM  := dupfind.exe
 DOS2UNIX := dos2unix

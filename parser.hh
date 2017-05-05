@@ -22,19 +22,19 @@ class Parser
     struct Cell;
     struct Key;
 
+    typedef std::map<Key, Value> Matrix;
+
 public:
     Parser(BookmarkContainer& container): timeForNewBookmark(true),
                                           itsContainer(container) {}
     const char* process(bool wordMode);
 
 private:
-    State       processChar(State                       state,
-                            const std::map<Key, Value>& matrix,
-                            size_t                      i);
-    void        performAction(Action action, char c, size_t i);
-    Bookmark    addChar(char c, int originalIndex);
-    const Cell* codeBehavior() const;
-    const Cell* textBehavior() const;
+    State         processChar(State state, const Matrix& matrix, size_t i);
+    void          performAction(Action action, char c, size_t i);
+    Bookmark      addChar(char c, int originalIndex);
+    const Matrix& codeBehavior() const;
+    const Matrix& textBehavior() const;
 
     bool               timeForNewBookmark;
     BookmarkContainer& itsContainer;
