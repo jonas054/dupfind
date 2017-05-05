@@ -25,8 +25,8 @@ int Dupfind::run(int argc, char* argv[])
 {
     itsOptions.parse(argc, argv);
 
-    Parser      parser;
-    const char* processed = parser.process(itsContainer, itsOptions.wordMode);
+    Parser      parser(itsContainer);
+    const char* processed = parser.process(itsOptions.wordMode);
     itsProcessedEnd = processed + strlen(processed);
 
     itsContainer.sort();

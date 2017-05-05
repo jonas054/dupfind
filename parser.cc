@@ -10,16 +10,41 @@
 using std::map;
 using std::string;
 
+struct Parser::Cell
+{
+    State  oldState;
+    char   event;
+    State  newState;
+    Action action;
+};
+
+struct Parser::Value
+{
+    State  newState;
+    Action action;
+};
+
+struct Parser::Key
+{
+    Key(State s, char e): oldState(s), event(e) {}
+    bool operator<(const Key& k) const
+    {
+        return (oldState < k.oldState ? true :
+                oldState > k.oldState ? false :
+                event < k.event);
+    }
+    State oldState;
+    char  event;
+};
+
 static const char ANY = '\0';
 
 /**
  * Reads the original text into a processed text, which is returned. Also sets
  * the bookmarks to point into the two strings.
  */
-const char* Parser::process(BookmarkContainer& bc, bool wordMode)
+const char* Parser::process(bool wordMode)
 {
-    itsContainer = &bc;
-
     map<Key, Value> matrix;
     const Cell* cells = wordMode ? textBehavior() : codeBehavior();
 
@@ -79,7 +104,7 @@ Parser::State Parser::processChar(State                  state,
             if (c == '#' || lookaheadIs(imports, i) || lookaheadIs(usings, i))
                 state = SKIP_TO_EOL;
             else
-                itsContainer->addBookmark(addChar(c, i));
+                itsContainer.addBookmark(addChar(c, i));
         else
             addChar(c, i);
 
@@ -101,10 +126,8 @@ void Parser::performAction(Action action, char c, size_t i)
     {
         const Bookmark bm = addChar(c, i);
         if (timeForNewBookmark)
-        {
-            itsContainer->addBookmark(bm);
-            timeForNewBookmark = false;
-        }
+            itsContainer.addBookmark(bm);
+        timeForNewBookmark = false;
         break;
     }
     case ADD_BOOKMARK:
@@ -112,7 +135,7 @@ void Parser::performAction(Action action, char c, size_t i)
         break;
     case ADD_SPACE:
         addChar(' ', i);
-        itsContainer->addBookmark(addChar(c, i));
+        itsContainer.addBookmark(addChar(c, i));
         break;
     case NA:
         break;

@@ -18,27 +18,14 @@ class Parser
 
     enum Action { NA, ADD_CHAR, ADD_SLASH_AND_CHAR, ADD_BOOKMARK, ADD_SPACE };
 
-    struct Cell { State oldState; char event; State newState; Action action; };
-
-    struct Value { State newState; Action action; };
-
-    struct Key
-    {
-        Key(State s, char e): oldState(s), event(e) {}
-        bool operator<(const Key& k) const
-        {
-            return (oldState < k.oldState ? true :
-                    oldState > k.oldState ? false :
-                    event < k.event);
-        }
-        State oldState;
-        char  event;
-    };
+    struct Value;
+    struct Cell;
+    struct Key;
 
 public:
-    Parser(): timeForNewBookmark(true) {}
-
-    const char* process(BookmarkContainer& container, bool wordMode);
+    Parser(BookmarkContainer& container): timeForNewBookmark(true),
+                                          itsContainer(container) {}
+    const char* process(bool wordMode);
 
 private:
     State       processChar(State                       state,
@@ -50,7 +37,7 @@ private:
     const Cell* textBehavior() const;
 
     bool               timeForNewBookmark;
-    BookmarkContainer* itsContainer;
+    BookmarkContainer& itsContainer;
     char*              itsProcessedText;
 };
 
