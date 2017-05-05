@@ -24,7 +24,7 @@ extern string readFileIntoString(const char* fileName)
     }
 
     std::ifstream in(fileName, ios::in);
-    if (!in.good())
+    if (not in.good())
     {
         cerr << "dupfind: File " << fileName << " not found.\n";
         exit(EXIT_FAILURE);

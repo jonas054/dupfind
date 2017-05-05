@@ -63,14 +63,14 @@ int Options::processFlag(int i, int argc, char* argv[])
         break;
     case 'e': {
         bool isRestrictedTotal = (totalReport == RESTRICTED_TOTAL);
-        for (int k = 1; !isRestrictedTotal && k < argc; ++k)
+        for (int k = 1; not isRestrictedTotal && k < argc; ++k)
             if (argv[k][0] == '-' && argv[k][1] == 't')
                 isRestrictedTotal = true;
         findFiles(".", argv[++i]);
         std::sort(foundFiles.begin(), foundFiles.end());
         for (size_t ii = 0; ii < foundFiles.size(); ++ii)
         {
-            if (!isRestrictedTotal ||
+            if (not isRestrictedTotal ||
                 foundFiles[ii].find("test") == string::npos)
             {
                 Bookmark::addFile(foundFiles[ii]);
@@ -118,7 +118,7 @@ void Options::findFiles(const string& dirName, const string& ending)
 {
     DIR* dir = opendir(dirName.c_str());
 
-    if (!dir)
+    if (dir == NULL)
         return;
 
     for (struct dirent* entry = readdir(dir); entry; entry = readdir(dir))
