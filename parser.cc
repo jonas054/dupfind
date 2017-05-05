@@ -4,9 +4,11 @@
 #include "bookmark_container.hh"
 
 #include <map>
+#include <string>
 #include <cstring> // strncmp
 
 using std::map;
+using std::string;
 
 static const char ANY = '\0';
 
@@ -41,10 +43,17 @@ const char* Parser::process(BookmarkContainer& bc, bool wordMode)
     return itsProcessedText;
 }
 
+static bool lookaheadIs(const string& s, int i)
+{
+    return strncmp(s.c_str(), &Bookmark::getChar(i), s.length()) == 0;
+}
+
 Parser::State Parser::processChar(State                  state,
                                   const map<Key, Value>& matrix,
                                   size_t                 i)
 {
+    static const string imports = "import";
+    static const string usings = "using";
     const char c = Bookmark::getChar(i);
     // Apparently there can be zeroes in the total string, but only when
     // running on some machines. Don't know why.
@@ -67,12 +76,8 @@ Parser::State Parser::processChar(State                  state,
     if (state == NORMAL && not isspace(c))
     { // Handle state/event pair that can't be handled by The Matrix.
         if (timeForNewBookmark && c != '}')
-            if (c == '#' ||
-                strncmp("import", &Bookmark::getChar(i), 6) == 0 ||
-                strncmp("using",  &Bookmark::getChar(i), 5) == 0)
-            {
+            if (c == '#' || lookaheadIs(imports, i) || lookaheadIs(usings, i))
                 state = SKIP_TO_EOL;
-            }
             else
                 itsContainer->addBookmark(addChar(c, i));
         else
@@ -165,7 +170,7 @@ const Parser::Cell* Parser::codeBehavior() const
 const Parser::Cell* Parser::textBehavior() const
 {
     static Cell c[] = {
-        // oldState event newState action
+        // oldState event newState  action
         { NORMAL,   ' ',  SPACE,    NA       },
         { NORMAL,   '\t', SPACE,    NA       },
         { NORMAL,   '\r', SPACE,    NA       },
