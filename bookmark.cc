@@ -15,7 +15,7 @@ static const char* order(int);
 
 int                               Bookmark::theirTotalNrOfLines = 0;
 std::vector<Bookmark::FileRecord> Bookmark::theirFileRecords;
-std::string                       Bookmark::theirTotalString;
+std::string                       Bookmark::theirOriginalString;
 
 /**
  * Reports one instance of duplication and optionally prints the duplicated
@@ -92,19 +92,19 @@ Bookmark::sameAs(Bookmark b, int nrOfCharacters, const char* end) const
 
 void Bookmark::addFile(const std::string& fileName)
 {
-    theirTotalString += readFileIntoString(fileName.c_str());
+    theirOriginalString += readFileIntoString(fileName.c_str());
     theirFileRecords.push_back(FileRecord(fileName,
-                                          theirTotalString.length()));
+                                          theirOriginalString.length()));
 }
 
 int Bookmark::details(int        processedLength,
                       DetailType detailType,
                       bool       wordMode) const
 {
-    const char* orig = theirTotalString.c_str() + itsOriginalIndex;
+    const char* orig = theirOriginalString.c_str() + itsOriginalIndex;
     if (not wordMode)
     {
-        while (orig > theirTotalString.c_str() && *orig != '\n')
+        while (orig > theirOriginalString.c_str() && *orig != '\n')
             --orig; // to include leading whitespace in printout
         ++orig;
     }
@@ -138,16 +138,6 @@ int Bookmark::details(int        processedLength,
     return count;
 }
 
-int Bookmark::lineNr(int offset, int index)
-{
-    const int start = (index == 0) ? 0 : theirFileRecords[index - 1].endIx;
-    int result = 1;
-    for (int i = start; i < offset; ++i)
-        if (Bookmark::theirTotalString[i] == '\n')
-            ++result;
-    return result;
-}
-
 std::ostream& operator<<(std::ostream& os, const Bookmark& b)
 {
     int recIx = 0;
@@ -157,4 +147,14 @@ std::ostream& operator<<(std::ostream& os, const Bookmark& b)
     os << Bookmark::theirFileRecords[recIx].fileName << ":"
        << Bookmark::lineNr(b.itsOriginalIndex, recIx);
     return os;
+}
+
+int Bookmark::lineNr(int offset, int index)
+{
+    const int start = (index == 0) ? 0 : theirFileRecords[index - 1].endIx;
+    int result = 1;
+    for (int i = start; i < offset; ++i)
+        if (theirOriginalString[i] == '\n')
+            ++result;
+    return result;
 }

@@ -59,9 +59,9 @@ public:
 
     static void addFile(const std::string& fileName);
 
-    static size_t totalLength() { return theirTotalString.length(); }
+    static size_t totalLength() { return theirOriginalString.length(); }
 
-    static const char& getChar(int i) { return theirTotalString[i]; }
+    static const char& getChar(int i) { return theirOriginalString[i]; }
 
 private:
     friend std::ostream& operator<<(std::ostream& os, const Bookmark& b);
@@ -76,7 +76,7 @@ private:
 
     static int                     theirTotalNrOfLines;
     static std::vector<FileRecord> theirFileRecords;
-    static std::string             theirTotalString;
+    static std::string             theirOriginalString;
 
     int         itsOriginalIndex;
     const char* itsProcessedText;
