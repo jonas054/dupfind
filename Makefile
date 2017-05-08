@@ -27,7 +27,7 @@ $(PROGRAM): $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^
 
 clean:
-	rm -f *.o *.exe dupfind
+	rm -f *.o *.o.d *.exe dupfind
 
 README.md: $(PROGRAM)
 	./$(PROGRAM) -h 2>&1 | $(DOS2UNIX) > help.txt
