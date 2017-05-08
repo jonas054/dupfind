@@ -88,17 +88,11 @@ int Options::processFlag(int i, int argc, char* argv[])
         wordMode = true;
         break;
     case 'm':
-        if (arg[2] == '\0')
-            printUsageAndExit(HIDE_EXT_FLAGS, EXIT_FAILURE);
-
+        minLength = atoi((arg[2] == '\0') ? argv[++i] : &arg[2]);
         nrOfWantedReports = INT_MAX;
-        minLength         = atoi(&arg[2]);
         break;
     case 'p':
-        if (arg[2] == '\0')
-            printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
-
-        proximityFactor = atoi(&arg[2]);
+        proximityFactor = atoi((arg[2] == '\0') ? argv[++i] : &arg[2]);
         if (proximityFactor < 1 || proximityFactor > 100)
         {
             cerr << "Proximity factor must be between 1 and 100 (inclusive)."
