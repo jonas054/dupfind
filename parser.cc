@@ -50,9 +50,9 @@ const char* Parser::process(bool wordMode)
     return itsProcessedText;
 }
 
-static bool lookaheadIs(const string& s, int i)
+static bool lookaheadIs(const string& s, const char& c)
 {
-    return strncmp(s.c_str(), &Bookmark::getChar(i), s.length()) == 0;
+    return strncmp(s.c_str(), &c, s.length()) == 0;
 }
 
 Parser::State Parser::processChar(State         state,
@@ -61,7 +61,7 @@ Parser::State Parser::processChar(State         state,
 {
     static const string imports = "import";
     static const string usings = "using";
-    const char c = Bookmark::getChar(i);
+    const char& c = Bookmark::getChar(i);
     // Apparently there can be zeroes in the total string, but only when
     // running on some machines. Don't know why.
     if (c == '\0')
@@ -80,10 +80,10 @@ Parser::State Parser::processChar(State         state,
         performAction(it->second.action, c, i);
         return it->second.newState;
     }
-    if (state == NORMAL && not isspace(c))
+    if (state == NORMAL)
     { // Handle state/event pair that can't be handled by The Matrix.
         if (timeForNewBookmark && c != '}')
-            if (c == '#' || lookaheadIs(imports, i) || lookaheadIs(usings, i))
+            if (lookaheadIs(imports, c) || lookaheadIs(usings, c))
                 state = SKIP_TO_EOL;
             else
                 itsContainer.addBookmark(addChar(c, i));
@@ -144,7 +144,10 @@ const Parser::Matrix& Parser::codeBehavior() const
         { { NORMAL,        '"'  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
         { { NORMAL,        '\'' }, { SINGLE_QUOTE,  ADD_CHAR     } },
         { { NORMAL,        '\n' }, { NORMAL,        ADD_BOOKMARK } },
-        // See special handling of NORMAL in code further down.
+        { { NORMAL,        ' '  }, { NORMAL,        NA           } },
+        { { NORMAL,        '\t' }, { NORMAL,        NA           } },
+        { { NORMAL,        '#'  }, { SKIP_TO_EOL,   NA           } },
+        // See special handling of NORMAL in code.
 
         { { DOUBLE_QUOTE,  '\\' }, { ESCAPE_DOUBLE, ADD_CHAR     } },
         { { DOUBLE_QUOTE,  '"'  }, { NORMAL,        ADD_CHAR     } },
