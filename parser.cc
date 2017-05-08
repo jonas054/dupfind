@@ -179,12 +179,12 @@ const Parser::Matrix& Parser::textBehavior() const
 {
     static Matrix m = {
         //  oldState  event     newState  action
-        { { NORMAL,   ' '  }, { SPACE,    NA       } },
-        { { NORMAL,   '\t' }, { SPACE,    NA       } },
-        { { NORMAL,   '\r' }, { SPACE,    NA       } },
-        { { NORMAL,   '\n' }, { SPACE,    NA       } },
-        { { NORMAL,   '' }, { SPACE,    NA       } },
-        { { NORMAL,   ANY  }, { NORMAL,   ADD_CHAR } },
+        { { NORMAL,   ' '  }, { SPACE,    NA        } },
+        { { NORMAL,   '\t' }, { SPACE,    NA        } },
+        { { NORMAL,   '\r' }, { SPACE,    NA        } },
+        { { NORMAL,   '\n' }, { SPACE,    NA        } },
+        { { NORMAL,   '' }, { SPACE,    NA        } },
+        { { NORMAL,   ANY  }, { NORMAL,   ADD_CHAR  } },
 
         { { SPACE,    ' '  }, { SPACE,    NA        } },
         { { SPACE,    '\t' }, { SPACE,    NA        } },
