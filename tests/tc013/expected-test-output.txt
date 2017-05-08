@@ -1,0 +1,85 @@
+./arithm.cpp:533:Duplication 1 (1st instance, 426 characters, 12 lines).
+./arithm.cpp:118:Duplication 1 (2nd instance).
+    ocl::Kernel k("KF", ocl::core::arithm_oclsrc, opts);
+    if (k.empty())
+        return false;
+
+    UMat src1 = _src1.getUMat(), src2;
+    UMat dst = _dst.getUMat(), mask = _mask.getUMat();
+
+    ocl::KernelArg src1arg = ocl::KernelArg::ReadOnlyNoSize(src1, cn, kercn);
+    ocl::KernelArg dstarg = haveMask ? ocl::KernelArg::ReadWrite(dst, cn, kercn) :
+                                       ocl::KernelArg::WriteOnly(dst, cn, kercn);
+    ocl::KernelArg maskarg = ocl::KernelArg::ReadOnlyNoSize(mask, 1);
+
+    if( haveScalar )
+    {
+        size_t esz = CV_ELEM_SIZE1(
+
+./arithm.cpp:2813:Duplication 2 (1st instance, 357 characters, 19 lines).
+./arithm.cpp:2916:Duplication 2 (2nd instance).
+    int code = *(int*)_cmpop;
+    step1 /= sizeof(src1[0]);
+    step2 /= sizeof(src2[0]);
+    if( code == CMP_GE || code == CMP_LT )
+    {
+        std::swap(src1, src2);
+        std::swap(step1, step2);
+        code = code == CMP_GE ? CMP_LE : CMP_GT;
+    }
+
+    if( code == CMP_GT || code == CMP_LE )
+    {
+        int m = code == CMP_GT ? 0 : 255;
+        for( ; height--; src1 += step1, src2 += step2, dst += step )
+        {
+            int x =0;
+            #if CV_SSE2
+            if( USE_SSE2)
+            {
+                __m128i m128 =  code == CMP_GT ? _mm_setzero_si128() : _mm_set1_epi
+
+./arithm.cpp:2857:Duplication 3 (1st instance, 243 characters, 15 lines).
+./arithm.cpp:2975:Duplication 3 (2nd instance).
+            for( ; x < width; x++ ){
+                 dst[x] = (uchar)(-(src1[x] > src2[x]) ^ m);
+            }
+        }
+    }
+    else if( code == CMP_EQ || code == CMP_NE )
+    {
+        int m = code == CMP_EQ ? 0 : 255;
+        for( ; height--; src1 += step1, src2 += step2, dst += step )
+        {
+            int x = 0;
+            #if CV_SSE2
+            if( USE_SSE2 )
+            {
+                __m128i m128 =  code == CMP_EQ ? _mm_setzero_si128() : _mm_set1_epi
+
+./arithm.cpp:2316:Duplication 4 (1st instance, 233 characters, 11 lines).
+./arithm.cpp:2340:Duplication 4 (2nd instance).
+        { \
+            CV_IMPL_ADD(CV_IMPL_IPP); \
+            return; \
+        } \
+        setIppErrorStatus(); \
+    }
+
+#define CALL_IPP_BIN_21(fun) \
+    CV_IPP_CHECK() \
+    { \
+        fixSteps(width, height, sizeof(dst[0]), step1, step2, step); \
+        if (0 <= CV_INSTRUMENT_FUN_IPP(fun, src2, (int)step2, src1, (int)step1, dst, (int)step, ippiSize(width, height)
+
+./arithm.cpp:2944:Duplication 5 (1st instance, 214 characters, 8 lines).
+./arithm.cpp:2998:Duplication 5 (2nd instance).
+                    r11 = _mm_packs_epi16(r00, r01);
+                    _mm_storeu_si128((__m128i*)(dst + x), r11);
+                }
+                if( x <= width - 8)
+                {
+                    __m128i r00 = _mm_loadu_si128((const __m128i*)(src1 + x));
+                    __m128i r10 = _mm_loadu_si128((const __m128i*)(src2 + x));
+                    r00 = _mm_xor_si128 ( _mm_cmp
+

@@ -61,4 +61,6 @@ test: $(PROGRAM)
 	@$(call testcase,tc009,-m200 -e .rb, "(Minimum length)")
 	@$(call testcase,tc010,-8 -e .rb, "(Count)")
 	@$(call testcase,tc011,-p15 -e .rb, "(Proximity)")
+	@$(call testcase,tc012,-t -e .cpp, "(C++ total)")
+	@$(call testcase,tc013,-v -e .cpp, "(C++ verbose)")
 	@echo OK

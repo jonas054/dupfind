@@ -1,0 +1,157 @@
+./arithm.cpp:533:Duplication 1 (1st instance, 426 characters, 12 lines).
+./arithm.cpp:118:Duplication 1 (2nd instance).
+
+./arithm.cpp:2813:Duplication 2 (1st instance, 357 characters, 19 lines).
+./arithm.cpp:2916:Duplication 2 (2nd instance).
+
+./arithm.cpp:2857:Duplication 3 (1st instance, 243 characters, 15 lines).
+./arithm.cpp:2975:Duplication 3 (2nd instance).
+
+./arithm.cpp:2316:Duplication 4 (1st instance, 233 characters, 11 lines).
+./arithm.cpp:2340:Duplication 4 (2nd instance).
+
+./arithm.cpp:2944:Duplication 5 (1st instance, 214 characters, 8 lines).
+./arithm.cpp:2998:Duplication 5 (2nd instance).
+
+./arithm.cpp:2076:Duplication 6 (1st instance, 206 characters, 7 lines).
+./arithm.cpp:2064:Duplication 6 (2nd instance).
+./arithm.cpp:2052:Duplication 6 (3rd instance).
+
+./arithm.cpp:2131:Duplication 7 (1st instance, 206 characters, 7 lines).
+./arithm.cpp:2120:Duplication 7 (2nd instance).
+
+./arithm.cpp:1822:Duplication 8 (1st instance, 196 characters, 6 lines).
+./arithm.cpp:1943:Duplication 8 (2nd instance).
+
+./arithm.cpp:1437:Duplication 9 (1st instance, 195 characters, 9 lines).
+./arithm.cpp:1463:Duplication 9 (2nd instance).
+
+./arithm.cpp:2153:Duplication 10 (1st instance, 177 characters, 7 lines).
+./arithm.cpp:2142:Duplication 10 (2nd instance).
+
+./arithm.cpp:2110:Duplication 11 (1st instance, 173 characters, 6 lines).
+./arithm.cpp:2099:Duplication 11 (2nd instance).
+./arithm.cpp:2088:Duplication 11 (3rd instance).
+
+./arithm.cpp:2312:Duplication 12 (1st instance, 173 characters, 4 lines).
+./arithm.cpp:2336:Duplication 12 (2nd instance).
+
+./arithm.cpp:2165:Duplication 13 (1st instance, 161 characters, 5 lines).
+./arithm.cpp:2191:Duplication 13 (2nd instance).
+
+./arithm.cpp:812:Duplication 14 (1st instance, 161 characters, 7 lines).
+./arithm.cpp:306:Duplication 14 (2nd instance).
+
+./arithm.cpp:2872:Duplication 15 (1st instance, 159 characters, 5 lines).
+./arithm.cpp:2990:Duplication 15 (2nd instance).
+
+./arithm.cpp:588:Duplication 16 (1st instance, 159 characters, 5 lines).
+./arithm.cpp:155:Duplication 16 (2nd instance).
+
+./arithm.cpp:565:Duplication 17 (1st instance, 153 characters, 8 lines).
+./arithm.cpp:145:Duplication 17 (2nd instance).
+
+./arithm.cpp:3060:Duplication 18 (1st instance, 153 characters, 5 lines).
+./arithm.cpp:3074:Duplication 18 (2nd instance).
+
+./arithm.cpp:833:Duplication 19 (1st instance, 151 characters, 7 lines).
+./arithm.cpp:768:Duplication 19 (2nd instance).
+
+./arithm.cpp:745:Duplication 20 (1st instance, 145 characters, 7 lines).
+./arithm.cpp:270:Duplication 20 (2nd instance).
+
+./arithm.cpp:606:Duplication 21 (1st instance, 144 characters, 3 lines).
+./arithm.cpp:171:Duplication 21 (2nd instance).
+
+./arithm.cpp:1416:Duplication 22 (1st instance, 143 characters, 10 lines).
+./arithm.cpp:1574:Duplication 22 (2nd instance).
+
+./arithm.cpp:1391:Duplication 23 (1st instance, 139 characters, 10 lines).
+./arithm.cpp:1554:Duplication 23 (2nd instance).
+
+./arithm.cpp:1500:Duplication 24 (1st instance, 139 characters, 10 lines).
+./arithm.cpp:1656:Duplication 24 (2nd instance).
+
+./arithm.cpp:1831:Duplication 25 (1st instance, 138 characters, 4 lines).
+./arithm.cpp:1952:Duplication 25 (2nd instance).
+
+./arithm.cpp:2201:Duplication 26 (1st instance, 137 characters, 4 lines).
+./arithm.cpp:2211:Duplication 26 (2nd instance).
+
+./arithm.cpp:2936:Duplication 27 (1st instance, 136 characters, 5 lines).
+./arithm.cpp:2834:Duplication 27 (2nd instance).
+
+./arithm.cpp:1323:Duplication 28 (1st instance, 134 characters, 8 lines).
+./arithm.cpp:1194:Duplication 28 (2nd instance).
+
+./arithm.cpp:2282:Duplication 29 (1st instance, 133 characters, 4 lines).
+./arithm.cpp:2262:Duplication 29 (2nd instance).
+
+./arithm.cpp:2292:Duplication 30 (1st instance, 133 characters, 4 lines).
+./arithm.cpp:2272:Duplication 30 (2nd instance).
+
+./arithm.cpp:1412:Duplication 31 (1st instance, 133 characters, 8 lines).
+./arithm.cpp:1387:Duplication 31 (2nd instance).
+
+./arithm.cpp:2941:Duplication 32 (1st instance, 133 characters, 3 lines).
+./arithm.cpp:2995:Duplication 32 (2nd instance).
+
+./arithm.cpp:2222:Duplication 33 (1st instance, 131 characters, 4 lines).
+./arithm.cpp:2232:Duplication 33 (2nd instance).
+
+./arithm.cpp:2252:Duplication 34 (1st instance, 131 characters, 4 lines).
+./arithm.cpp:2242:Duplication 34 (2nd instance).
+
+./arithm.cpp:1370:Duplication 35 (1st instance, 128 characters, 7 lines).
+./arithm.cpp:1538:Duplication 35 (2nd instance).
+
+./arithm.cpp:433:Duplication 36 (1st instance, 127 characters, 6 lines).
+./arithm.cpp:417:Duplication 36 (2nd instance).
+
+./arithm.cpp:320:Duplication 37 (1st instance, 123 characters, 6 lines).
+./arithm.cpp:288:Duplication 37 (2nd instance).
+./arithm.cpp:1339:Duplication 37 (3rd instance).
+
+./arithm.cpp:1307:Duplication 38 (1st instance, 120 characters, 5 lines).
+./arithm.cpp:1184:Duplication 38 (2nd instance).
+
+./arithm.cpp:222:Duplication 39 (1st instance, 119 characters, 3 lines).
+./arithm.cpp:655:Duplication 39 (2nd instance).
+
+./arithm.cpp:852:Duplication 40 (1st instance, 113 characters, 5 lines).
+./arithm.cpp:789:Duplication 40 (2nd instance).
+
+./arithm.cpp:1884:Duplication 41 (1st instance, 112 characters, 6 lines).
+./arithm.cpp:1997:Duplication 41 (2nd instance).
+
+./arithm.cpp:425:Duplication 42 (1st instance, 110 characters, 5 lines).
+./arithm.cpp:441:Duplication 42 (2nd instance).
+
+./arithm.cpp:104:Duplication 43 (1st instance, 110 characters, 2 lines).
+./arithm.cpp:499:Duplication 43 (2nd instance).
+
+./arithm.cpp:2961:Duplication 44 (1st instance, 110 characters, 5 lines).
+./arithm.cpp:3015:Duplication 44 (2nd instance).
+
+./arithm.cpp:1528:Duplication 45 (1st instance, 109 characters, 9 lines).
+./arithm.cpp:1496:Duplication 45 (2nd instance).
+
+./arithm.cpp:1871:Duplication 46 (1st instance, 103 characters, 2 lines).
+./arithm.cpp:1975:Duplication 46 (2nd instance).
+
+./arithm.cpp:1988:Duplication 47 (1st instance, 102 characters, 4 lines).
+./arithm.cpp:1875:Duplication 47 (2nd instance).
+
+./arithm.cpp:1043:Duplication 48 (1st instance, 102 characters, 4 lines).
+./arithm.cpp:1052:Duplication 48 (2nd instance).
+
+./arithm.cpp:2952:Duplication 49 (1st instance, 101 characters, 7 lines).
+./arithm.cpp:3006:Duplication 49 (2nd instance).
+
+./arithm.cpp:628:Duplication 50 (1st instance, 101 characters, 2 lines).
+./arithm.cpp:197:Duplication 50 (2nd instance).
+
+./arithm.cpp:585:Duplication 51 (1st instance, 100 characters, 5 lines).
+./arithm.cpp:562:Duplication 51 (2nd instance).
+
+Duplication = 343 lines, 19 %
