@@ -1,0 +1,15 @@
+./arithm.cpp:533:Duplication 1 (1st instance, 426 characters, 12 lines).
+./arithm.cpp:118:Duplication 1 (2nd instance).
+
+./arithm.cpp:2813:Duplication 2 (1st instance, 357 characters, 19 lines).
+./arithm.cpp:2916:Duplication 2 (2nd instance).
+
+./arithm.cpp:2857:Duplication 3 (1st instance, 243 characters, 15 lines).
+./arithm.cpp:2975:Duplication 3 (2nd instance).
+
+./offense_count_formatter.rb:39:Duplication 4 (1st instance, 235 characters, 14 lines).
+./worst_offenders_formatter.rb:44:Duplication 4 (2nd instance).
+
+./arithm.cpp:2316:Duplication 5 (1st instance, 233 characters, 11 lines).
+./arithm.cpp:2340:Duplication 5 (2nd instance).
+

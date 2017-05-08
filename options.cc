@@ -76,6 +76,8 @@ int Options::processFlag(int i, int argc, char* argv[])
                 Bookmark::addFile(foundFiles[ii]);
             }
         }
+        foundFiles.clear();
+        excludes.clear();
         break;
     }
     case 'v':
