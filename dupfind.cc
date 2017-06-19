@@ -8,9 +8,10 @@
 //
 //=============================================================================
 
-#include <cstdlib>    // EXIT_SUCCESS, EXIT_FAILURE
+#include <cstdlib>    // EXIT_SUCCESS, EXIT_FAILURE, abs
 #include <iostream>   // cout, endl
 #include <cstring>    // strlen
+#include <algorithm>  // min
 
 #include "dupfind.hh"
 #include "duplication.hh"
@@ -108,20 +109,17 @@ int Dupfind::expandSearch(Duplication& duplication,
                           int          startingPoint,
                           int          loopIncrement) const
 {
-    int steps = 0;
-    for (int i = duplication.indexOf1stInstance + startingPoint;
-         i >= 0 && i < int(itsContainer.size());
-         i += loopIncrement)
+    int startIndex = duplication.indexOf1stInstance + startingPoint;
+    int i = startIndex;
+    for (; i >= 0 && i < int(itsContainer.size()); i += loopIncrement)
     {
         const int same = itsContainer.nrOfSame(duplication.indexOf1stInstance,
                                                i);
         if (same < almostLongest)
             break;
-        steps++;
-        if (duplication.longestSame > same)
-            duplication.longestSame = same;
+        duplication.longestSame = std::min(duplication.longestSame, same);
     }
-    return steps;
+    return std::abs(i - startIndex);
 }
 
 int main(int argc, char* argv[])
