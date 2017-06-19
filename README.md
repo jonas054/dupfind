@@ -38,7 +38,7 @@ text. The comment removal works for all programming languages that use either
 `/* ... */`, `// ...` or `# ...` as comments. This means that C, C++, C#, Java,
 and similar languages are fully supported. Perl, Ruby, and Python are mostly
 supported, but they also have other comment syntax that is not handled. Lisp
-and SQL and not supported when it comes to comments.
+and SQL are not supported when it comes to comments.
 
 ### Word Mode
 
