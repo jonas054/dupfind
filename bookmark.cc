@@ -127,11 +127,9 @@ int Bookmark::details(int        processedLength,
                 blankLine = false;
             // In word mode, a space in the processed text means any kind of
             // space, so we can not continue to search for an exact match.
-            if (*orig == itsProcessedText[pi] ||
-                (isspace(itsProcessedText[pi]) && isspace(*orig)))
-            {
+            char t = itsProcessedText[pi];
+            if (*orig == t || (isspace(t) && isspace(*orig)))
                 break;
-            }
         }
     if (detailType == PRINT_LINES)
         cout << endl;
