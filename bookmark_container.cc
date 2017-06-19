@@ -50,22 +50,13 @@ void BookmarkContainer::clearWithin(const Duplication& d)
           itsBookmarks[d.indexOf1stInstance + i].itsProcessedText;
 
         for (size_t ix = 0; ix < itsBookmarks.size() - 1; ++ix)
-            if (itsBookmarks[ix].itsProcessedText >= reportStart &&
-                itsBookmarks[ix].itsProcessedText <
-                reportStart + d.longestSame)
-            {
+        {
+            const char* t = itsBookmarks[ix].itsProcessedText;
+            if (t >= reportStart && t < reportStart + d.longestSame)
                 itsBookmarks[ix].clear();
-            }
+        }
     }
-    getRidOfHoles();
-}
-
-/**
- * Removes all bookmarks where the "itsProcessedText" field is null while
- * maintaining a sorted bookmark array.
- */
-void BookmarkContainer::getRidOfHoles()
-{
+    // Remove all cleared bookmarks while maintaining a sorted array.
     std::vector<Bookmark>::iterator newEnd =
         std::remove_if(itsBookmarks.begin(), itsBookmarks.end(),
                        std::mem_fun_ref(&Bookmark::isCleared));

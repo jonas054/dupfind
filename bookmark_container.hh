@@ -28,8 +28,6 @@ public:
     void clearWithin(const Duplication& duplication);
 
 private:
-    void getRidOfHoles();
-
     std::vector<Bookmark> itsBookmarks;
 };
 
