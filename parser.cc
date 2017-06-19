@@ -192,7 +192,7 @@ const Parser::Matrix& Parser::textBehavior() const
         { { SPACE,    '\n' }, { SPACE,    NA        } },
         { { SPACE,    '' }, { SPACE,    NA        } },
         { { SPACE,    ANY  }, { NORMAL,   ADD_SPACE } },
- 
+
         { { NO_STATE, ANY  }, { NO_STATE, NA        } }
     };
     return m;
