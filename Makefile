@@ -1,14 +1,14 @@
 CXX      := g++
 CC       := $(CXX)
-CXXFLAGS := -W -Wall -O2 -g --std=c++11
+CXXFLAGS := -W -Wall -O2 -g --std=c++11 $(EXTRA_FLAGS)
 ifeq ($(OS),Windows_NT)
 PROGRAM  := dupfind.exe
 DOS2UNIX := dos2unix
-LDFLAGS  := --static
+LDFLAGS  := --static $(EXTRA_FLAGS)
 else
 PROGRAM  := dupfind
 DOS2UNIX := cat
-LDFLAGS  :=
+LDFLAGS  := $(EXTRA_FLAGS)
 endif
 SOURCE   := $(filter-out %_flymake.cc,$(wildcard *.cc))
 OBJS     := $(patsubst %.cc,%.o,$(SOURCE))
