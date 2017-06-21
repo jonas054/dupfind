@@ -4,22 +4,12 @@
 
 #include <algorithm> // stable_sort, remove_if, mem_fun_ref
 
-void BookmarkContainer::addBookmark(const Bookmark& bm)
-{
-    itsBookmarks.push_back(bm);
-}
-
 void BookmarkContainer::report(int                bookmarkIx,
                                const Duplication& duplication,
                                int                instanceNr,
                                const Options&     options) const
 {
     itsBookmarks[bookmarkIx].report(duplication, instanceNr, options);
-}
-
-size_t BookmarkContainer::size() const
-{
-    return itsBookmarks.size();
 }
 
 bool BookmarkContainer::same(int a,
