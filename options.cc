@@ -36,7 +36,10 @@ void Options::parse(int argc, char* argv[])
             processFileName(argv[i]);
 
     if (Bookmark::totalLength() == 0)
-        printUsageAndExit(Options::HIDE_EXT_FLAGS, EXIT_FAILURE);
+    {
+        std::cout << "No files found" << std::endl;
+        printUsageAndExit(Options::SHOW_EXT_FLAGS, EXIT_FAILURE);
+    }
 }
 
 int Options::processFlag(int i, int argc, char* argv[])

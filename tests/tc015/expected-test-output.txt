@@ -1,31 +1,77 @@
-./cowboy_http.erl:375:Duplication 1 (1st instance, 179 characters, 4 lines).
-./cowboy_http.erl:385:Duplication 1 (2nd instance).
-./cowboy_http.erl:394:Duplication 1 (3rd instance).
-	case C of
-		$\r -> error_terminate(400, State, {connection_error, protocol_error,
-			'The request-target must not be followed by a line break. (RFC7230 3.1.1)'});
-		$\s -> parse_version(Rest, State, M
+./cowboy_http.erl:167:Duplication 1 (1st instance, 490 characters, 18 lines).
+./cowboy_http2.erl:208:Duplication 1 (2nd instance).
+		{{Pid, StreamID}, Msg} when Pid =:= self() ->
+			loop(info(State, StreamID, Msg), Buffer);
+		%% Exit signal from children.
+		Msg = {'EXIT', Pid, _} ->
+			loop(down(State, Pid, Msg), Buffer);
+		%% Calls from supervisor module.
+		{'$gen_call', {From, Tag}, which_children} ->
+			From ! {Tag, cowboy_children:which_children(Children, ?MODULE)},
+			loop(State, Buffer);
+		{'$gen_call', {From, Tag}, count_children} ->
+			From ! {Tag, cowboy_children:count_children(Children)},
+			loop(State, Buffer);
+		{'$gen_call', {From, Tag}, _} ->
+			From ! {Tag, {error, ?MODULE}},
+			loop(State, Buffer);
+		Msg ->
+			error_logger:error_msg("Received stray message ~p.
 
-./cowboy_http.erl:731:Duplication 2 (1st instance, 141 characters, 3 lines).
-./cowboy_http.erl:271:Duplication 2 (2nd instance).
-			Class, Exception, erlang:get_stacktrace()),
-		stream_reset(State, StreamID, {internal_error, {Class, Exception},
-			'Unhandled exception in cowboy_stream:
+./cowboy_http.erl:1076:Duplication 2 (1st instance, 351 characters, 9 lines).
+./cowboy_http2.erl:851:Duplication 2 (2nd instance).
+-spec system_continue(_, _, {#state{}, binary()}) -> ok.
+system_continue(_, _, {State, Buffer}) ->
+	loop(State, Buffer).
 
-./cowboy_http.erl:264:Duplication 3 (1st instance, 110 characters, 3 lines).
-./cowboy_http.erl:724:Duplication 3 (2nd instance).
-				{Commands, StreamState} ->
-					Streams = lists:keyreplace(StreamID, #stream.id, Streams0,
-						Stream#stream{state=StreamState}),
+-spec system_terminate(any(), _, _, {#state{}, binary()}) -> no_return().
+system_terminate(Reason, _, _, {State, _}) ->
+	terminate(State, Reason).
 
-./cowboy_http.erl:658:Duplication 4 (1st instance, 109 characters, 2 lines).
-./cowboy_http.erl:646:Duplication 4 (2nd instance).
-http2_upgrade(State=#state{parent=Parent, ref=Ref, socket=Socket, transport=Transport,
-		opts=Opts, peer=Peer}, Buffer
+-spec system_code_change(Misc, _, _, _) -> {ok, Misc} when Misc::{#state{}, binary()}.
+system_code_change(Misc, _, _, _) ->
+	{ok, Misc}.
 
-./cowboy_http.erl:550:Duplication 5 (1st instance, 109 characters, 3 lines).
-./cowboy_http.erl:538:Duplication 5 (2nd instance).
-			error_terminate(400, State#state{in_state=PS#ps_header{headers=Headers}},
-				{stream_error, StreamID, protocol_error,
-					'
+./cowboy_http2.erl:419:Duplication 3 (1st instance, 350 characters, 14 lines).
+./cowboy_http.erl:706:Duplication 3 (2nd instance).
+down(State=#state{children=Children0}, Pid, Msg) ->
+	case cowboy_children:down(Children0, Pid) of
+		%% The stream was terminated already.
+		{ok, undefined, Children} ->
+			State#state{children=Children};
+		%% The stream is still running.
+		{ok, StreamID, Children} ->
+			info(State#state{children=Children}, StreamID, Msg);
+		%% The process was unknown.
+		error ->
+			error_logger:error_msg("Received EXIT signal ~p for unknown process ~p.~n", [Msg, Pid]),
+			State
+	end.
+
+info(State=#state{streams=Streams
+
+./cowboy_http.erl:728:Duplication 4 (1st instance, 310 characters, 9 lines).
+./cowboy_http2.erl:442:Duplication 4 (2nd instance).
+			catch Class:Exception ->
+				cowboy_stream:report_error(info,
+					[StreamID, Msg, StreamState0],
+					Class, Exception, erlang:get_stacktrace()),
+				stream_reset(State, StreamID, {internal_error, {Class, Exception},
+					'Unhandled exception in cowboy_stream:info/3.'})
+			end;
+		false ->
+			error_logger:error_msg("Received message ~p for unknown stream ~p.
+
+./cowboy_http.erl:965:Duplication 5 (1st instance, 244 characters, 10 lines).
+./cowboy_http2.erl:810:Duplication 5 (2nd instance).
+	end.
+
+stream_call_terminate(StreamID, Reason, StreamState) ->
+	try
+		cowboy_stream:terminate(StreamID, Reason, StreamState)
+	catch Class:Exception ->
+		cowboy_stream:report_error(terminate,
+			[StreamID, Reason, StreamState],
+			Class, Exception, erlang:get_stacktrace())
+	end.
 
