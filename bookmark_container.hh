@@ -18,7 +18,7 @@ public:
                 int                instanceNr,
                 const Options&     options) const;
 
-    bool same(int a, int b, int longestSame, const char* processedEnd) const;
+    bool same(size_t a, size_t b, int longestSame, const char* processedEnd) const;
 
     int nrOfSame(int a, int b) const;
 

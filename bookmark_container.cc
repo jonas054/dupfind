@@ -12,8 +12,8 @@ void BookmarkContainer::report(int                bookmarkIx,
     itsBookmarks[bookmarkIx].report(duplication, instanceNr, options);
 }
 
-bool BookmarkContainer::same(int a,
-                             int b,
+bool BookmarkContainer::same(size_t a,
+                             size_t b,
                              int longestSame,
                              const char* processedEnd) const
 {

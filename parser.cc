@@ -15,10 +15,9 @@ struct Parser::Key
     Key(Language l, State s, char e): language(l), oldState(s), event(e) {}
     bool operator<(const Key& k) const
     {
-        if (language != ALL && k.language != ALL)
-            return language < k.language;
-
-        return (oldState < k.oldState ? true :
+        return (language < k.language ? true :
+                language > k.language ? false :
+                oldState < k.oldState ? true :
                 oldState > k.oldState ? false :
                 event < k.event);
     }
@@ -80,7 +79,9 @@ Parser::State Parser::processChar(State         state,
     Language language = getLanguage(Bookmark::getFileName(i));
     Matrix::const_iterator it;
     if ((it = matrix.find({ language, state, c }))   != matrix.end() ||
-        (it = matrix.find({ language, state, ANY })) != matrix.end())
+        (it = matrix.find({ language, state, ANY })) != matrix.end() ||
+        (it = matrix.find({ ALL, state, c }))   != matrix.end() ||
+        (it = matrix.find({ ALL, state, ANY })) != matrix.end())
     {
         performAction(it->second.action, c, i);
         return it->second.newState;
@@ -108,12 +109,29 @@ static bool endsWith(const std::string& str, const std::string& suffix)
 
 Parser::Language Parser::getLanguage(const string& fileName)
 {
-    if (endsWith(fileName, ".c"))
+    if (endsWith(fileName, ".c") or
+        endsWith(fileName, ".cc") or
+        endsWith(fileName, ".h") or
+        endsWith(fileName, ".hh") or
+        endsWith(fileName, ".hpp") or
+        endsWith(fileName, ".cpp") or
+        endsWith(fileName, ".java"))
+    {
         return C_FAMILY;
-    // if (endsWith(fileName, ".erl"))
-    //     return ERLANG;
-    else
-        return ALL;
+    }
+    if (endsWith(fileName, ".erl") or
+        endsWith(fileName, ".hrl"))
+    {
+        return ERLANG;
+    }
+    if (endsWith(fileName, ".rb") or
+        endsWith(fileName, ".py") or
+        endsWith(fileName, ".sh") or
+        endsWith(fileName, ".pl"))
+    {
+        return SCRIPT;
+    }
+    return ALL;
 }
 
 void Parser::performAction(Action action, char c, size_t i)
@@ -167,8 +185,10 @@ const Parser::Matrix& Parser::codeBehavior() const
         { { ALL,      NORMAL,     '\n' }, { NORMAL,        ADD_BOOKMARK } },
         { { ALL,      NORMAL,     ' '  }, { NORMAL,        NA           } },
         { { ALL,      NORMAL,     '\t' }, { NORMAL,        NA           } },
-        { { SCRIPT,   NORMAL,     '#'  }, { SKIP_TO_EOL,   NA           } },
         { { C_FAMILY, NORMAL,     '#'  }, { SKIP_TO_EOL,   NA           } },
+        { { SCRIPT,   NORMAL,     '#'  }, { SKIP_TO_EOL,   NA           } },
+        { { ERLANG,   NORMAL,     '#'  }, { NORMAL,        NA           } },
+        { { ERLANG,   NORMAL,     '%'  }, { SKIP_TO_EOL,   NA           } },
         // See special handling of NORMAL in code.
 
         { { ALL, DOUBLE_QUOTE,  '\\' }, { ESCAPE_DOUBLE, ADD_CHAR     } },

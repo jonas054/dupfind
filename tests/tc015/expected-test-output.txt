@@ -1,81 +1,31 @@
-./cowboy_http.erl:1:Duplication 1 (1st instance, 680 characters, 14 lines).
-./cowboy_clear.erl:1:Duplication 1 (2nd instance).
-% Copyright (c) 2016-2017, Loïc Hoguin <essen@ninenines.eu>
-%%
-%% Permission to use, copy, modify, and/or distribute this software for any
-%% purpose with or without fee is hereby granted, provided that the above
-%% copyright notice and this permission notice appear in all copies.
-%%
-%% THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-%% WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-%% MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-%% ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-%% WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-%% ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-%% OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
--module(cowboy_clear).
--behavior(ranch_protocol).
-
--export([start_link/4]).
--export([connection_process/5]).
-
--spec start_link(ranch:ref(), inet:socket(), module(), cowboy:opts()) -> {ok, pid()}.
-start_link(Ref, Socket, Transport, Opts) ->
-	Pid = proc_lib:spawn_link(?MODULE, connection_process,
-		[self(), Ref, Socket, Transport, Opts]),
-	{ok, Pid}.
-
--spec connection_process(pid(), ranch:ref(), inet:socket(), module(), cowboy:opts()) -> ok.
-connection_process(Parent, Ref, Socket, Transport, Opts) ->
-	ok = ranch:accept_ack(Ref),
-	init(Parent, Ref, Socket, Transport, Opts, cowboy_http).
-
-init(Parent, Ref, Socket, Transport, Opts, Protocol) ->
-	_ = case maps:get(connection_type, Opts, supervisor) of
-		worker -> ok;
-		supervisor -> process_flag(trap_exit, true)
-	end,
-	Protocol:init(Parent, Ref, Socket, Transport, Opts).
-%% Copyright (c) 2016-2017, Loïc Hoguin <essen@ninenines.eu>
-%%
-%% Permission to use, copy, modify, and/or distribute this software for any
-%% purpose with or without fee is hereby granted, provided that the above
-%% copyright notice and this permission notice appear in all copies.
-%%
-%% THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-%% WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-%% MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-%% ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-%% WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-%% ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-%% OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
--module(cowboy_
-
-./cowboy_http.erl:375:Duplication 2 (1st instance, 179 characters, 4 lines).
-./cowboy_http.erl:385:Duplication 2 (2nd instance).
-./cowboy_http.erl:394:Duplication 2 (3rd instance).
+./cowboy_http.erl:375:Duplication 1 (1st instance, 179 characters, 4 lines).
+./cowboy_http.erl:385:Duplication 1 (2nd instance).
+./cowboy_http.erl:394:Duplication 1 (3rd instance).
 	case C of
 		$\r -> error_terminate(400, State, {connection_error, protocol_error,
 			'The request-target must not be followed by a line break. (RFC7230 3.1.1)'});
 		$\s -> parse_version(Rest, State, M
 
-./cowboy_http.erl:731:Duplication 3 (1st instance, 141 characters, 3 lines).
-./cowboy_http.erl:271:Duplication 3 (2nd instance).
+./cowboy_http.erl:731:Duplication 2 (1st instance, 141 characters, 3 lines).
+./cowboy_http.erl:271:Duplication 2 (2nd instance).
 			Class, Exception, erlang:get_stacktrace()),
 		stream_reset(State, StreamID, {internal_error, {Class, Exception},
 			'Unhandled exception in cowboy_stream:
 
-./cowboy_http.erl:477:Duplication 4 (1st instance, 107 characters, 4 lines).
-./cowboy_http.erl:431:Duplication 4 (2nd instance).
-		nomatch when byte_size(Buffer) > MaxLength ->
-			error_terminate(431, State#state{in_state=PS#ps_header{headers=Headers}},
-				{connection_error, limit_reached,
-					'A header 
+./cowboy_http.erl:264:Duplication 3 (1st instance, 110 characters, 3 lines).
+./cowboy_http.erl:724:Duplication 3 (2nd instance).
+				{Commands, StreamState} ->
+					Streams = lists:keyreplace(StreamID, #stream.id, Streams0,
+						Stream#stream{state=StreamState}),
 
-./cowboy_http.erl:803:Duplication 5 (1st instance, 101 characters, 2 lines).
-./cowboy_http.erl:784:Duplication 5 (2nd instance).
-	%% @todo I'm pretty sure the last stream in the list is the one we want
-	%% considering all others are queued.
+./cowboy_http.erl:658:Duplication 4 (1st instance, 109 characters, 2 lines).
+./cowboy_http.erl:646:Duplication 4 (2nd instance).
+http2_upgrade(State=#state{parent=Parent, ref=Ref, socket=Socket, transport=Transport,
+		opts=Opts, peer=Peer}, Buffer
+
+./cowboy_http.erl:550:Duplication 5 (1st instance, 109 characters, 3 lines).
+./cowboy_http.erl:538:Duplication 5 (2nd instance).
+			error_terminate(400, State#state{in_state=PS#ps_header{headers=Headers}},
+				{stream_error, StreamID, protocol_error,
+					'
 

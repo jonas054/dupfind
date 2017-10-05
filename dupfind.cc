@@ -75,7 +75,7 @@ Duplication Dupfind::findWorst() const
     Duplication result;
 
     // Find the two bookmarks that have the longest common substring.
-    for (size_t markIx = 0; markIx < itsContainer.size() - 1; ++markIx)
+    for (size_t markIx = 0; markIx + 1 < itsContainer.size(); ++markIx)
         if (itsContainer.same(markIx, markIx + 1, result.longestSame,
                               itsProcessedEnd))
         {
