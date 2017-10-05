@@ -67,4 +67,5 @@ test: $(PROGRAM)
 	@$(call testcase,tc012,-t -e .cpp,"C++ total")
 	@$(call testcase,tc013,-v -e .cpp,"C++ verbose")
 	@$(call testcase,tc014,-e .cpp -e .rb,"C++ and Ruby")
+	@$(call testcase,tc015,-v -e .erl,"Erlang verbose")
 	@echo OK

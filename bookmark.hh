@@ -63,6 +63,8 @@ public:
 
     static const char& getChar(int i) { return theirOriginalString[i]; }
 
+    static const std::string getFileName(int i);
+
 private:
     friend std::ostream& operator<<(std::ostream& os, const Bookmark& b);
     friend class BookmarkContainer;

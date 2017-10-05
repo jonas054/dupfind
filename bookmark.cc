@@ -10,12 +10,13 @@
 
 using std::cout;
 using std::endl;
+using std::string;
 
 static const char* order(int);
 
 int                               Bookmark::theirTotalNrOfLines = 0;
 std::vector<Bookmark::FileRecord> Bookmark::theirFileRecords;
-std::string                       Bookmark::theirOriginalString;
+string                            Bookmark::theirOriginalString;
 
 /**
  * Reports one instance of duplication and optionally prints the duplicated
@@ -90,7 +91,7 @@ Bookmark::sameAs(Bookmark b, int nrOfCharacters, const char* end) const
     return true;
 }
 
-void Bookmark::addFile(const std::string& fileName)
+void Bookmark::addFile(const string& fileName)
 {
     theirOriginalString += readFileIntoString(fileName.c_str());
     theirFileRecords.push_back(FileRecord(fileName,
@@ -155,4 +156,12 @@ int Bookmark::lineNr(int offset, int index)
         if (theirOriginalString[i] == '\n')
             ++result;
     return result;
+}
+
+const string Bookmark::getFileName(int i)
+{
+    int recIx = 0;
+    while (Bookmark::theirFileRecords[recIx].endIx <= i)
+        ++recIx;
+    return Bookmark::theirFileRecords[recIx].fileName;  
 }

@@ -12,13 +12,17 @@ using std::string;
 
 struct Parser::Key
 {
-    Key(State s, char e): oldState(s), event(e) {}
+    Key(Language l, State s, char e): language(l), oldState(s), event(e) {}
     bool operator<(const Key& k) const
     {
+        if (language != ALL && k.language != ALL)
+            return language < k.language;
+
         return (oldState < k.oldState ? true :
                 oldState > k.oldState ? false :
                 event < k.event);
     }
+    Language language;
     State oldState;
     char  event;
 };
@@ -73,9 +77,10 @@ Parser::State Parser::processChar(State         state,
         return NORMAL;
     }
 
+    Language language = getLanguage(Bookmark::getFileName(i));
     Matrix::const_iterator it;
-    if ((it = matrix.find({ state, c }))   != matrix.end() ||
-        (it = matrix.find({ state, ANY })) != matrix.end())
+    if ((it = matrix.find({ language, state, c }))   != matrix.end() ||
+        (it = matrix.find({ language, state, ANY })) != matrix.end())
     {
         performAction(it->second.action, c, i);
         return it->second.newState;
@@ -93,6 +98,22 @@ Parser::State Parser::processChar(State         state,
         timeForNewBookmark = false;
     }
     return state;
+}
+
+static bool endsWith(const std::string& str, const std::string& suffix)
+{
+    return str.size() >= suffix.size() &&
+                  str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+Parser::Language Parser::getLanguage(const string& fileName)
+{
+    if (endsWith(fileName, ".c"))
+        return C_FAMILY;
+    // if (endsWith(fileName, ".erl"))
+    //     return ERLANG;
+    else
+        return ALL;
 }
 
 void Parser::performAction(Action action, char c, size_t i)
@@ -139,38 +160,39 @@ Bookmark Parser::addChar(char c, int originalIndex)
 const Parser::Matrix& Parser::codeBehavior() const
 {
     static Matrix m = {
-        //  oldState       event     newState       action
-        { { NORMAL,        '/'  }, { COMMENT_START, NA           } },
-        { { NORMAL,        '"'  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
-        { { NORMAL,        '\'' }, { SINGLE_QUOTE,  ADD_CHAR     } },
-        { { NORMAL,        '\n' }, { NORMAL,        ADD_BOOKMARK } },
-        { { NORMAL,        ' '  }, { NORMAL,        NA           } },
-        { { NORMAL,        '\t' }, { NORMAL,        NA           } },
-        { { NORMAL,        '#'  }, { SKIP_TO_EOL,   NA           } },
+        // language,  oldState    event     newState       action
+        { { ALL,      NORMAL,     '/'  }, { COMMENT_START, NA           } },
+        { { ALL,      NORMAL,     '"'  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
+        { { ALL,      NORMAL,     '\'' }, { SINGLE_QUOTE,  ADD_CHAR     } },
+        { { ALL,      NORMAL,     '\n' }, { NORMAL,        ADD_BOOKMARK } },
+        { { ALL,      NORMAL,     ' '  }, { NORMAL,        NA           } },
+        { { ALL,      NORMAL,     '\t' }, { NORMAL,        NA           } },
+        { { SCRIPT,   NORMAL,     '#'  }, { SKIP_TO_EOL,   NA           } },
+        { { C_FAMILY, NORMAL,     '#'  }, { SKIP_TO_EOL,   NA           } },
         // See special handling of NORMAL in code.
 
-        { { DOUBLE_QUOTE,  '\\' }, { ESCAPE_DOUBLE, ADD_CHAR     } },
-        { { DOUBLE_QUOTE,  '"'  }, { NORMAL,        ADD_CHAR     } },
-        { { DOUBLE_QUOTE,  ANY  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
-        { { DOUBLE_QUOTE,  '\n' }, { NORMAL,        ADD_BOOKMARK } }, // (1)
-        { { SINGLE_QUOTE,  '\\' }, { ESCAPE_SINGLE, ADD_CHAR     } },
-        { { SINGLE_QUOTE,  '\'' }, { NORMAL,        ADD_CHAR     } },
-        { { SINGLE_QUOTE,  ANY  }, { SINGLE_QUOTE,  ADD_CHAR     } },
-        { { SINGLE_QUOTE,  '\n' }, { NORMAL,        ADD_BOOKMARK } }, // (1)
-        { { ESCAPE_SINGLE, ANY  }, { SINGLE_QUOTE,  ADD_CHAR     } },
-        { { ESCAPE_DOUBLE, ANY  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
+        { { ALL, DOUBLE_QUOTE,  '\\' }, { ESCAPE_DOUBLE, ADD_CHAR     } },
+        { { ALL, DOUBLE_QUOTE,  '"'  }, { NORMAL,        ADD_CHAR     } },
+        { { ALL, DOUBLE_QUOTE,  ANY  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
+        { { ALL, DOUBLE_QUOTE,  '\n' }, { NORMAL,        ADD_BOOKMARK } }, // (1)
+        { { ALL, SINGLE_QUOTE,  '\\' }, { ESCAPE_SINGLE, ADD_CHAR     } },
+        { { ALL, SINGLE_QUOTE,  '\'' }, { NORMAL,        ADD_CHAR     } },
+        { { ALL, SINGLE_QUOTE,  ANY  }, { SINGLE_QUOTE,  ADD_CHAR     } },
+        { { ALL, SINGLE_QUOTE,  '\n' }, { NORMAL,        ADD_BOOKMARK } }, // (1)
+        { { ALL, ESCAPE_SINGLE, ANY  }, { SINGLE_QUOTE,  ADD_CHAR     } },
+        { { ALL, ESCAPE_DOUBLE, ANY  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
         // (1) probably a mistake if quote reaches end-of-line.
 
-        { { COMMENT_START, '*'  }, { C_COMMENT,     NA                 } },
-        { { COMMENT_START, '/'  }, { SKIP_TO_EOL,   NA                 } },
-        { { COMMENT_START, ANY  }, { NORMAL,        ADD_SLASH_AND_CHAR } },
-        { { SKIP_TO_EOL,   '\n' }, { NORMAL,        ADD_BOOKMARK       } },
-        { { C_COMMENT,     '*'  }, { C_COMMENT_END, NA                 } },
-        { { C_COMMENT_END, '/'  }, { NORMAL,        NA                 } },
-        { { C_COMMENT_END, '*'  }, { C_COMMENT_END, NA                 } },
-        { { C_COMMENT_END, ANY  }, { C_COMMENT,     NA                 } },
+        { { ALL, COMMENT_START, '*'  }, { C_COMMENT,     NA                 } },
+        { { ALL, COMMENT_START, '/'  }, { SKIP_TO_EOL,   NA                 } },
+        { { ALL, COMMENT_START, ANY  }, { NORMAL,        ADD_SLASH_AND_CHAR } },
+        { { ALL, SKIP_TO_EOL,   '\n' }, { NORMAL,        ADD_BOOKMARK       } },
+        { { ALL, C_COMMENT,     '*'  }, { C_COMMENT_END, NA                 } },
+        { { ALL, C_COMMENT_END, '/'  }, { NORMAL,        NA                 } },
+        { { ALL, C_COMMENT_END, '*'  }, { C_COMMENT_END, NA                 } },
+        { { ALL, C_COMMENT_END, ANY  }, { C_COMMENT,     NA                 } },
 
-        { { NO_STATE,      ANY  }, { NO_STATE,      NA                 } }
+        { { ALL, NO_STATE,      ANY  }, { NO_STATE,      NA                 } }
     };
     return m;
 }
@@ -179,21 +201,21 @@ const Parser::Matrix& Parser::textBehavior() const
 {
     static Matrix m = {
         //  oldState  event     newState  action
-        { { NORMAL,   ' '  }, { SPACE,    NA        } },
-        { { NORMAL,   '\t' }, { SPACE,    NA        } },
-        { { NORMAL,   '\r' }, { SPACE,    NA        } },
-        { { NORMAL,   '\n' }, { SPACE,    NA        } },
-        { { NORMAL,   '' }, { SPACE,    NA        } },
-        { { NORMAL,   ANY  }, { NORMAL,   ADD_CHAR  } },
+        { { ALL, NORMAL,   ' '  }, { SPACE,    NA        } },
+        { { ALL, NORMAL,   '\t' }, { SPACE,    NA        } },
+        { { ALL, NORMAL,   '\r' }, { SPACE,    NA        } },
+        { { ALL, NORMAL,   '\n' }, { SPACE,    NA        } },
+        { { ALL, NORMAL,   '' }, { SPACE,    NA        } },
+        { { ALL, NORMAL,   ANY  }, { NORMAL,   ADD_CHAR  } },
 
-        { { SPACE,    ' '  }, { SPACE,    NA        } },
-        { { SPACE,    '\t' }, { SPACE,    NA        } },
-        { { SPACE,    '\r' }, { SPACE,    NA        } },
-        { { SPACE,    '\n' }, { SPACE,    NA        } },
-        { { SPACE,    '' }, { SPACE,    NA        } },
-        { { SPACE,    ANY  }, { NORMAL,   ADD_SPACE } },
+        { { ALL, SPACE,    ' '  }, { SPACE,    NA        } },
+        { { ALL, SPACE,    '\t' }, { SPACE,    NA        } },
+        { { ALL, SPACE,    '\r' }, { SPACE,    NA        } },
+        { { ALL, SPACE,    '\n' }, { SPACE,    NA        } },
+        { { ALL, SPACE,    '' }, { SPACE,    NA        } },
+        { { ALL, SPACE,    ANY  }, { NORMAL,   ADD_SPACE } },
 
-        { { NO_STATE, ANY  }, { NO_STATE, NA        } }
+        { { ALL, NO_STATE, ANY  }, { NO_STATE, NA        } }
     };
     return m;
 }
