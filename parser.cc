@@ -3,6 +3,7 @@
 #include "bookmark.hh"
 #include "bookmark_container.hh"
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <cstring> // strncmp
@@ -34,6 +35,35 @@ struct Parser::Value
 
 static const char ANY = '\0';
 
+const char* Parser::stateToString(Parser::State s)
+{
+    switch (s)
+    {
+    case NORMAL: return "NORMAL";
+    case COMMENT_START: return "COMMENT_START";
+    case C_COMMENT: return "C_COMMENT";
+    case C_COMMENT_END: return "C_COMMENT_END";
+    case DOUBLE_QUOTE: return "DOUBLE_QUOTE";
+    case DOUBLE_QUOTE_1: return "DOUBLE_QUOTE_1";
+    case DOUBLE_QUOTE_2: return "DOUBLE_QUOTE_2";
+    case DOUBLE_QUOTE_3: return "DOUBLE_QUOTE_3";
+    case DOUBLE_QUOTE_4: return "DOUBLE_QUOTE_4";
+    case DOUBLE_QUOTE_5: return "DOUBLE_QUOTE_5";
+    case SINGLE_QUOTE_1: return "SINGLE_QUOTE_1";
+    case SINGLE_QUOTE_2: return "SINGLE_QUOTE_2";
+    case SINGLE_QUOTE_3: return "SINGLE_QUOTE_3";
+    case SINGLE_QUOTE_4: return "SINGLE_QUOTE_4";
+    case SINGLE_QUOTE_5: return "SINGLE_QUOTE_5";
+    case SINGLE_QUOTE: return "SINGLE_QUOTE";
+    case ESCAPE_DOUBLE: return "ESCAPE_DOUBLE";
+    case ESCAPE_SINGLE: return "ESCAPE_SINGLE";
+    case SKIP_TO_EOL: return "SKIP_TO_EOL";
+    case SPACE: return "SPACE";
+    case NO_STATE: return "NO_STATE";
+    default: return "unknown";
+    }
+}
+
 /**
  * Reads the original text into a processed text, which is returned. Also sets
  * the bookmarks to point into the two strings.
@@ -46,7 +76,11 @@ const char* Parser::process(bool wordMode)
 
     State state = NORMAL;
     for (size_t i = 0; i < Bookmark::totalLength(); ++i)
+    {
         state = processChar(state, matrix, i);
+        // std::cout << stateToString(state) << ' '
+        //           << Bookmark::getChar(i) << "\n";
+    }
 
     addChar('\0', Bookmark::totalLength());
 
