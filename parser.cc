@@ -231,13 +231,13 @@ const Parser::Matrix& Parser::codeBehavior() const
 
         { { PYTHON, DOUBLE_QUOTE_1, '"' }, { DOUBLE_QUOTE_2, NA       } },
         { { PYTHON, DOUBLE_QUOTE_2, '"' }, { DOUBLE_QUOTE_3, NA       } },
-        { { PYTHON, DOUBLE_QUOTE_2, ANY }, { NORMAL,         ADD_CHAR } },
-        { { PYTHON, DOUBLE_QUOTE_1, ANY }, { DOUBLE_QUOTE,   ADD_CHAR } },
         { { PYTHON, DOUBLE_QUOTE_3, '"' }, { DOUBLE_QUOTE_4, NA       } },
-        { { PYTHON, DOUBLE_QUOTE_3, ANY }, { DOUBLE_QUOTE_3, NA       } },
         { { PYTHON, DOUBLE_QUOTE_4, '"' }, { DOUBLE_QUOTE_5, NA       } },
-        { { PYTHON, DOUBLE_QUOTE_4, ANY }, { DOUBLE_QUOTE_3, NA       } },
         { { PYTHON, DOUBLE_QUOTE_5, '"' }, { NORMAL,         NA       } },
+        { { PYTHON, DOUBLE_QUOTE_1, ANY }, { DOUBLE_QUOTE,   ADD_CHAR } },
+        { { PYTHON, DOUBLE_QUOTE_2, ANY }, { NORMAL,         ADD_CHAR } },
+        { { PYTHON, DOUBLE_QUOTE_3, ANY }, { DOUBLE_QUOTE_3, NA       } },
+        { { PYTHON, DOUBLE_QUOTE_4, ANY }, { DOUBLE_QUOTE_3, NA       } },
         { { PYTHON, DOUBLE_QUOTE_5, ANY }, { DOUBLE_QUOTE_3, NA       } },
 
         { { PYTHON, SINGLE_QUOTE_1, '\'' }, { SINGLE_QUOTE_2, NA       } },
