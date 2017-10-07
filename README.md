@@ -36,9 +36,10 @@ In normal mode, which is suited for analyzing source code, the analyzed files
 are read into memory and all white space and comments are removed from the
 text. The comment removal works for all programming languages that use either
 `/* ... */`, `// ...` or `# ...` as comments. This means that C, C++, C#, Java,
-and similar languages are fully supported. Perl, Ruby, and Python are mostly
-supported, but they also have other comment syntax that is not handled. Lisp
-and SQL are not supported when it comes to comments.
+and similar languages are fully supported, Bash, Csh, etc. also. There's
+support for Python's triple quote comments and Erlang's `% ...` comments. Perl
+and Ruby are mostly supported, but they also have other comment syntax that is
+not handled. Lisp and SQL are not supported when it comes to comments.
 
 ### Word Mode
 
