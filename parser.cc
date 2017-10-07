@@ -104,7 +104,7 @@ Parser::State Parser::processChar(State         state,
 static bool endsWith(const std::string& str, const std::string& suffix)
 {
     return str.size() >= suffix.size() &&
-                  str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+      str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
 Parser::Language Parser::getLanguage(const string& fileName)
@@ -194,14 +194,14 @@ const Parser::Matrix& Parser::codeBehavior() const
         { { ALL, DOUBLE_QUOTE,  '\\' }, { ESCAPE_DOUBLE, ADD_CHAR     } },
         { { ALL, DOUBLE_QUOTE,  '"'  }, { NORMAL,        ADD_CHAR     } },
         { { ALL, DOUBLE_QUOTE,  ANY  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
-        { { ALL, DOUBLE_QUOTE,  '\n' }, { NORMAL,        ADD_BOOKMARK } }, // (1)
+        { { ALL, DOUBLE_QUOTE,  '\n' }, { NORMAL,        ADD_BOOKMARK } }, // 1
         { { ALL, SINGLE_QUOTE,  '\\' }, { ESCAPE_SINGLE, ADD_CHAR     } },
         { { ALL, SINGLE_QUOTE,  '\'' }, { NORMAL,        ADD_CHAR     } },
         { { ALL, SINGLE_QUOTE,  ANY  }, { SINGLE_QUOTE,  ADD_CHAR     } },
-        { { ALL, SINGLE_QUOTE,  '\n' }, { NORMAL,        ADD_BOOKMARK } }, // (1)
+        { { ALL, SINGLE_QUOTE,  '\n' }, { NORMAL,        ADD_BOOKMARK } }, // 1
         { { ALL, ESCAPE_SINGLE, ANY  }, { SINGLE_QUOTE,  ADD_CHAR     } },
         { { ALL, ESCAPE_DOUBLE, ANY  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
-        // (1) probably a mistake if quote reaches end-of-line.
+        // 1: probably a mistake if quote reaches end-of-line.
 
         { { ALL, COMMENT_START, '*'  }, { C_COMMENT,     NA                 } },
         { { ALL, COMMENT_START, '/'  }, { SKIP_TO_EOL,   NA                 } },
