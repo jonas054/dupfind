@@ -125,11 +125,14 @@ Parser::Language Parser::getLanguage(const string& fileName)
         return ERLANG;
     }
     if (endsWith(fileName, ".rb") or
-        endsWith(fileName, ".py") or
         endsWith(fileName, ".sh") or
         endsWith(fileName, ".pl"))
     {
         return SCRIPT;
+    }
+    if (endsWith(fileName, ".py"))
+    {
+        return PYTHON;
     }
     return ALL;
 }
@@ -178,18 +181,41 @@ Bookmark Parser::addChar(char c, int originalIndex)
 const Parser::Matrix& Parser::codeBehavior() const
 {
     static Matrix m = {
-        // language,  oldState    event     newState       action
-        { { ALL,      NORMAL,     '/'  }, { COMMENT_START, NA           } },
-        { { ALL,      NORMAL,     '"'  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
-        { { ALL,      NORMAL,     '\'' }, { SINGLE_QUOTE,  ADD_CHAR     } },
-        { { ALL,      NORMAL,     '\n' }, { NORMAL,        ADD_BOOKMARK } },
-        { { ALL,      NORMAL,     ' '  }, { NORMAL,        NA           } },
-        { { ALL,      NORMAL,     '\t' }, { NORMAL,        NA           } },
-        { { C_FAMILY, NORMAL,     '#'  }, { SKIP_TO_EOL,   NA           } },
-        { { SCRIPT,   NORMAL,     '#'  }, { SKIP_TO_EOL,   NA           } },
-        { { ERLANG,   NORMAL,     '#'  }, { NORMAL,        NA           } },
-        { { ERLANG,   NORMAL,     '%'  }, { SKIP_TO_EOL,   NA           } },
+        // language,  oldState    event     newState        action
+        { { ALL,      NORMAL,     '/'  }, { COMMENT_START,  NA           } },
+        { { ALL,      NORMAL,     '"'  }, { DOUBLE_QUOTE,   ADD_CHAR     } },
+        { { ALL,      NORMAL,     '\'' }, { SINGLE_QUOTE,   ADD_CHAR     } },
+        { { ALL,      NORMAL,     '\n' }, { NORMAL,         ADD_BOOKMARK } },
+        { { ALL,      NORMAL,     ' '  }, { NORMAL,         NA           } },
+        { { ALL,      NORMAL,     '\t' }, { NORMAL,         NA           } },
+        { { ALL,      NORMAL,     '#'  }, { SKIP_TO_EOL,    NA           } },
+        { { ERLANG,   NORMAL,     '#'  }, { NORMAL,         NA           } },
+        { { ERLANG,   NORMAL,     '%'  }, { SKIP_TO_EOL,    NA           } },
+        { { PYTHON,   NORMAL,     '"'  }, { DOUBLE_QUOTE_1, NA           } },
+        { { PYTHON,   NORMAL,     '\'' }, { SINGLE_QUOTE_1, NA           } },
         // See special handling of NORMAL in code.
+
+        { { PYTHON, DOUBLE_QUOTE_1, '"' }, { DOUBLE_QUOTE_2, NA       } },
+        { { PYTHON, DOUBLE_QUOTE_2, '"' }, { DOUBLE_QUOTE_3, NA       } },
+        { { PYTHON, DOUBLE_QUOTE_2, ANY }, { NORMAL,         ADD_CHAR } },
+        { { PYTHON, DOUBLE_QUOTE_1, ANY }, { DOUBLE_QUOTE,   ADD_CHAR } },
+        { { PYTHON, DOUBLE_QUOTE_3, '"' }, { DOUBLE_QUOTE_4, NA       } },
+        { { PYTHON, DOUBLE_QUOTE_3, ANY }, { DOUBLE_QUOTE_3, NA       } },
+        { { PYTHON, DOUBLE_QUOTE_4, '"' }, { DOUBLE_QUOTE_5, NA       } },
+        { { PYTHON, DOUBLE_QUOTE_4, ANY }, { DOUBLE_QUOTE_3, NA       } },
+        { { PYTHON, DOUBLE_QUOTE_5, '"' }, { NORMAL,         NA       } },
+        { { PYTHON, DOUBLE_QUOTE_5, ANY }, { DOUBLE_QUOTE_3, NA       } },
+
+        { { PYTHON, SINGLE_QUOTE_1, '\'' }, { SINGLE_QUOTE_2, NA       } },
+        { { PYTHON, SINGLE_QUOTE_2, '\'' }, { SINGLE_QUOTE_3, NA       } },
+        { { PYTHON, SINGLE_QUOTE_2, ANY  }, { NORMAL,         ADD_CHAR } },
+        { { PYTHON, SINGLE_QUOTE_1, ANY  }, { SINGLE_QUOTE,   ADD_CHAR } },
+        { { PYTHON, SINGLE_QUOTE_3, '\'' }, { SINGLE_QUOTE_4, NA       } },
+        { { PYTHON, SINGLE_QUOTE_3, ANY  }, { SINGLE_QUOTE_3, NA       } },
+        { { PYTHON, SINGLE_QUOTE_4, '\'' }, { SINGLE_QUOTE_5, NA       } },
+        { { PYTHON, SINGLE_QUOTE_4, ANY  }, { SINGLE_QUOTE_3, NA       } },
+        { { PYTHON, SINGLE_QUOTE_5, '\'' }, { NORMAL,         NA       } },
+        { { PYTHON, SINGLE_QUOTE_5, ANY  }, { SINGLE_QUOTE_3, NA       } },
 
         { { ALL, DOUBLE_QUOTE,  '\\' }, { ESCAPE_DOUBLE, ADD_CHAR     } },
         { { ALL, DOUBLE_QUOTE,  '"'  }, { NORMAL,        ADD_CHAR     } },

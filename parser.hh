@@ -9,11 +9,15 @@ class BookmarkContainer;
 
 class Parser
 {
-    enum Language { C_FAMILY, SCRIPT, ERLANG, ALL };
+    enum Language { C_FAMILY, SCRIPT, ERLANG, PYTHON, ALL };
 
     enum State
     {
         NORMAL, COMMENT_START, C_COMMENT, C_COMMENT_END, DOUBLE_QUOTE,
+        DOUBLE_QUOTE_1, DOUBLE_QUOTE_2, DOUBLE_QUOTE_3,
+        DOUBLE_QUOTE_4, DOUBLE_QUOTE_5,
+        SINGLE_QUOTE_1, SINGLE_QUOTE_2, SINGLE_QUOTE_3,
+        SINGLE_QUOTE_4, SINGLE_QUOTE_5,
         SINGLE_QUOTE, ESCAPE_DOUBLE, ESCAPE_SINGLE, SKIP_TO_EOL, SPACE,
         NO_STATE
     };
@@ -37,7 +41,7 @@ private:
     Bookmark      addChar(char c, int originalIndex);
     const Matrix& codeBehavior() const;
     const Matrix& textBehavior() const;
-    Language getLanguage(const std::string& fileName);
+    Language      getLanguage(const std::string& fileName);
 
     bool               timeForNewBookmark;
     BookmarkContainer& itsContainer;

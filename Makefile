@@ -68,4 +68,5 @@ test: $(PROGRAM)
 	@$(call testcase,tc013,-v -e .cpp,"C++ verbose")
 	@$(call testcase,tc014,-e .cpp -e .rb,"C++ and Ruby")
 	@$(call testcase,tc015,-v -e .erl,"Erlang verbose")
+	@$(call testcase,tc016,-v -e .py,"Python verbose")
 	@echo OK

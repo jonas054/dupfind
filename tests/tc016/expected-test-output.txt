@@ -1,0 +1,53 @@
+./sunau.py:344:Duplication 1 (1st instance, 168 characters, 7 lines).
+./wave.py:333:Duplication 1 (2nd instance).
+        self._nchannels = nchannels
+
+    def getnchannels(self):
+        if not self._nchannels:
+            raise Error('number of channels not set')
+        return self._nchannels
+
+    def setsampwidth(self, sampwidth):
+        if self._
+
+./wave.py:411:Duplication 2 (1st instance, 167 characters, 6 lines).
+./sunau.py:413:Duplication 2 (2nd instance).
+    def tell(self):
+        return self._nframeswritten
+
+    def writeframesraw(self, data):
+        if not isinstance(data, (bytes, bytearray)):
+            data = memoryview(data).cast('B')
+        self._ensure_header_written(
+
+./sunau.py:402:Duplication 3 (1st instance, 162 characters, 6 lines).
+./wave.py:390:Duplication 3 (2nd instance).
+        self.setnchannels(nchannels)
+        self.setsampwidth(sampwidth)
+        self.setframerate(framerate)
+        self.setnframes(nframes)
+        self.setcomptype(comptype, compname)
+
+    def getparams(self):
+
+./wave.py:219:Duplication 4 (1st instance, 150 characters, 7 lines).
+./sunau.py:258:Duplication 4 (2nd instance).
+                  self.getframerate(), self.getnframes(),
+                  self.getcomptype(), self.getcompname())
+
+    def getmarkers(self):
+        return None
+
+    def getmark(self, id):
+        raise Error('no marks')
+
+    def
+
+./sunau.py:409:Duplication 5 (1st instance, 139 characters, 4 lines).
+./sunau.py:257:Duplication 5 (2nd instance).
+        return _sunau_params(self.getnchannels(), self.getsampwidth(),
+                  self.getframerate(), self.getnframes(),
+                  self.getcomptype(), self.getcompname())
+
+    def
+
