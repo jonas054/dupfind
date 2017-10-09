@@ -43,7 +43,9 @@ README.md: $(PROGRAM)
 define testcase
 	printf "%s: %-28s %s %s\n" $(1) $(3) $(PROGRAM) "$(2)"
 	cd tests/data && ../../$(PROGRAM) $(2) > ../$(1)/test-output.txt
-	diff -w tests/$(1)/expected-test-output.txt tests/$(1)/test-output.txt
+	diff -w tests/$(1)/expected-test-output.txt \
+        tests/$(1)/test-output.txt || (echo "There were test failures." && \
+                                       false)
 endef
 
 SOME_RB_FILES := offense_count_formatter.rb worst_offenders_formatter.rb
