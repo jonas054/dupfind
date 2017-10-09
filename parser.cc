@@ -207,9 +207,8 @@ void Parser::performAction(Action action, char c, size_t i)
 Bookmark Parser::addChar(char c, int originalIndex)
 {
     static int procIx;
-    Bookmark bookmark(originalIndex, &itsProcessedText[procIx]);
-    itsProcessedText[procIx++] = c;
-    return bookmark;
+    itsProcessedText[procIx] = c;
+    return Bookmark(originalIndex, &itsProcessedText[procIx++]);
 }
 
 const Parser::Matrix& Parser::codeBehavior() const
