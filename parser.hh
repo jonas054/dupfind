@@ -3,6 +3,7 @@
 
 #include <cstdlib> // size_t
 #include <map>
+#include <string>
 
 class Bookmark;
 class BookmarkContainer;
@@ -42,7 +43,7 @@ private:
     const Matrix& codeBehavior() const;
     const Matrix& textBehavior() const;
     Language      getLanguage(const std::string& fileName);
-    const char*         stateToString(State s);
+    const char*   stateToString(State s);
 
     bool               timeForNewBookmark;
     BookmarkContainer& itsContainer;
