@@ -2,7 +2,8 @@
 #include "bookmark_container.hh"
 #include "duplication.hh"
 
-#include <algorithm> // stable_sort, remove_if, mem_fun_ref
+#include <algorithm> // stable_sort, remove_if
+#include <functional> // mem_fun_ref
 
 void BookmarkContainer::report(int                bookmarkIx,
                                const Duplication& duplication,
