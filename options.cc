@@ -37,7 +37,7 @@ void Options::parse(int argc, char* argv[])
 
     if (Bookmark::totalLength() == 0)
     {
-        std::cout << "No files found" << std::endl;
+        std::cerr << "No files found" << std::endl;
         printUsageAndExit(Options::SHOW_EXT_FLAGS, EXIT_FAILURE);
     }
 }

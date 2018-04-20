@@ -42,7 +42,11 @@ README.md: $(PROGRAM)
 
 define testcase
 	printf "%s: %-28s %s %s\n" $(1) $(3) $(PROGRAM) "$(2)"
-	cd tests/data && ../../$(PROGRAM) $(2) > ../$(1)/test-output.txt
+	cd tests/data && ../../$(PROGRAM) $(2) > ../$(1)/test-output.txt \
+        2> ../$(1)/test-error.txt || true
+	diff -w tests/$(1)/expected-test-error.txt \
+        tests/$(1)/test-error.txt || (echo "There were unexpect errors." && \
+                                      false)
 	diff -w tests/$(1)/expected-test-output.txt \
         tests/$(1)/test-output.txt || (echo "There were test failures." && \
                                        false)
@@ -72,4 +76,5 @@ test: $(PROGRAM)
 	@$(call testcase,tc015,-v -e .erl,"Erlang verbose")
 	@$(call testcase,tc016,-v -e .py,"Python verbose")
 	@$(call testcase,tc017,-v -e .java,"Java verbose")
+	@$(call testcase,tc019,-e .junk,"Non-existing extension")
 	@echo OK
