@@ -1,0 +1,196 @@
+./ReactFiberClassComponent.js:992:Duplication 1 (1st instance, 1416 characters, 87 lines).
+./ReactFiberClassComponent.js:793:Duplication 1 (2nd instance).
+        workInProgress,
+        workInProgress.updateQueue,
+        instance,
+        newProps,
+        renderExpirationTime,
+      );
+
+      let updateQueue = workInProgress.updateQueue;
+      if (
+        updateQueue !== null &&
+        updateQueue.capturedValues !== null &&
+        (enableGetDerivedStateFromCatch &&
+          typeof ctor.getDerivedStateFromCatch === 'function')
+      ) {
+        const capturedValues = updateQueue.capturedValues;
+        // Don't remove these from the update queue yet. We need them in
+        // finishClassComponent. Do the reset there.
+        // TODO: This is awkward. Refactor class components.
+        // updateQueue.capturedValues = null;
+        derivedStateFromCatch = callGetDerivedStateFromCatch(
+          ctor,
+          capturedValues,
+        );
+      }
+    } else {
+      newState = oldState;
+    }
+
+    let derivedStateFromProps;
+    if (oldProps !== newProps) {
+      // The prevState parameter should be the partially updated state.
+      // Otherwise, spreading state in return values could override updates.
+      derivedStateFromProps = callGetDerivedStateFromProps(
+        workInProgress,
+        instance,
+        newProps,
+        newState,
+      );
+    }
+
+    if (derivedStateFromProps !== null && derivedStateFromProps !== undefined) {
+      // Render-phase updates (like this) should not be added to the update queue,
+      // So that multiple render passes do not enqueue multiple updates.
+      // Instead, just synchronously merge the returned state into the instance.
+      newState =
+        newState === null || newState === undefined
+          ? derivedStateFromProps
+          : Object.assign({}, newState, derivedStateFromProps);
+
+      // Update the base state of the update queue.
+      // FIXME: This is getting ridiculous. Refactor plz!
+      const updateQueue = workInProgress.updateQueue;
+      if (updateQueue !== null) {
+        updateQueue.baseState = Object.assign(
+          {},
+          updateQueue.baseState,
+          derivedStateFromProps,
+        );
+      }
+    }
+    if (derivedStateFromCatch !== null && derivedStateFromCatch !== undefined) {
+      // Render-phase updates (like this) should not be added to the update queue,
+      // So that multiple render passes do not enqueue multiple updates.
+      // Instead, just synchronously merge the returned state into the instance.
+      newState =
+        newState === null || newState === undefined
+          ? derivedStateFromCatch
+          : Object.assign({}, newState, derivedStateFromCatch);
+
+      // Update the base state of the update queue.
+      // FIXME: This is getting ridiculous. Refactor plz!
+      const updateQueue = workInProgress.updateQueue;
+      if (updateQueue !== null) {
+        updateQueue.baseState = Object.assign(
+          {},
+          updateQueue.baseState,
+          derivedStateFromCatch,
+        );
+      }
+    }
+
+    if (
+      oldProps === newProps &&
+      oldState === newState &&
+      !hasContextChanged() &&
+      !(
+        workInProgress.updateQueue !== null &&
+        workInProgress.updateQueue.hasForceUpdate
+      )
+    ) {
+      // If an update was already in progress, we should schedule an Update
+      // effect even though we're bailing out, so that cWU/cDU are called.
+      if (typeof instance.componentDid
+
+./ReactFiberClassComponent.js:747:Duplication 2 (1st instance, 963 characters, 40 lines).
+./ReactFiberClassComponent.js:945:Duplication 2 (2nd instance).
+    workInProgress: Fiber,
+    renderExpirationTime: ExpirationTime,
+  ): boolean {
+    const ctor = workInProgress.type;
+    const instance = workInProgress.stateNode;
+    resetInputPointers(workInProgress, instance);
+
+    const oldProps = workInProgress.memoizedProps;
+    const newProps = workInProgress.pendingProps;
+    const oldContext = instance.context;
+    const newUnmaskedContext = getUnmaskedContext(workInProgress);
+    const newContext = getMaskedContext(workInProgress, newUnmaskedContext);
+
+    const hasNewLifecycles =
+      typeof ctor.getDerivedStateFromProps === 'function' ||
+      typeof instance.getSnapshotBeforeUpdate === 'function';
+
+    // Note: During these life-cycles, instance.props/instance.state are what
+    // ever the previously attempted to render - not the "current". However,
+    // during componentDidUpdate we pass the "current" props.
+
+    // In order to support react-lifecycles-compat polyfilled components,
+    // Unsafe lifecycles should not be invoked for components using the new APIs.
+    if (
+      !hasNewLifecycles &&
+      (typeof instance.UNSAFE_componentWillReceiveProps === 'function' ||
+        typeof instance.componentWillReceiveProps === 'function')
+    ) {
+      if (oldProps !== newProps || oldContext !== newContext) {
+        callComponentWillReceiveProps(
+          workInProgress,
+          instance,
+          newProps,
+          newContext,
+        );
+      }
+    }
+
+    // Compute the next state using the memoized state and the update queue.
+    const oldState = workInProgress.memoizedState;
+    // TODO: Previous state can be null.
+    let newState;
+    let derivedStateFromCatch;
+
+    if (workInProgress.updateQueue !== null) {
+      newState = processUpdateQueue(
+
+./ReactFiberCommitWork.js:318:Duplication 3 (1st instance, 347 characters, 9 lines).
+./ReactFiberCommitWork.js:351:Duplication 3 (2nd instance).
+        const updateQueue = finishedWork.updateQueue;
+        invariant(
+          updateQueue !== null && updateQueue.capturedValues !== null,
+          'An error logging effect should not have been scheduled if no errors ' +
+            'were captured. This error is likely caused by a bug in React. ' +
+            'Please file an issue.',
+        );
+        const capturedErrors = updateQueue.capturedValues;
+        updateQueue.capturedValues = null;
+
+./ReactFiberClassComponent.js:1085:Duplication 4 (1st instance, 270 characters, 15 lines).
+./ReactFiberClassComponent.js:1139:Duplication 4 (2nd instance).
+        if (
+          oldProps !== current.memoizedProps ||
+          oldState !== current.memoizedState
+        ) {
+          workInProgress.effectTag |= Update;
+        }
+      }
+      if (typeof instance.getSnapshotBeforeUpdate === 'function') {
+        if (
+          oldProps !== current.memoizedProps ||
+          oldState !== current.memoizedState
+        ) {
+          workInProgress.effectTag |= Snapshot;
+        }
+      }
+
+./ReactFiberClassComponent.js:1100:Duplication 5 (1st instance, 197 characters, 16 lines).
+./ReactFiberClassComponent.js:888:Duplication 5 (2nd instance).
+      return false;
+    }
+
+    const shouldUpdate = checkShouldComponentUpdate(
+      workInProgress,
+      oldProps,
+      newProps,
+      oldState,
+      newState,
+      newContext,
+    );
+
+    if (shouldUpdate) {
+      // In order to support react-lifecycles-compat polyfilled components,
+      // Unsafe lifecycles should not be invoked for components using the new APIs.
+      if (
+        !hasNewLifecycles &&
+        (typeof instance.UNSAFE_componentWill
+
