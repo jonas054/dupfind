@@ -78,4 +78,5 @@ test: $(PROGRAM)
 	@$(call testcase,tc017,-v -e .java,"Java verbose")
 	@$(call testcase,tc018,-v -e .js,"Javascript verbose")
 	@$(call testcase,tc019,-e .junk,"Non-existing extension")
+	@$(call testcase,tc020,cat.js,"Special characters in Javascript")
 	@echo OK

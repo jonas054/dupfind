@@ -43,6 +43,7 @@ const char* Parser::stateToString(Parser::State s)
     case COMMENT_START: return "COMMENT_START";
     case C_COMMENT: return "C_COMMENT";
     case C_COMMENT_END: return "C_COMMENT_END";
+    case REGEXP: return "REGEXP";
     case DOUBLE_QUOTE: return "DOUBLE_QUOTE";
     case DOUBLE_QUOTE_1: return "DOUBLE_QUOTE_1";
     case DOUBLE_QUOTE_2: return "DOUBLE_QUOTE_2";
@@ -160,6 +161,7 @@ Parser::Language Parser::getLanguage(const string& fileName)
     }
     if (endsWith(fileName, ".rb") or
         endsWith(fileName, ".sh") or
+        endsWith(fileName, ".js") or
         endsWith(fileName, ".pl"))
     {
         return SCRIPT;
@@ -261,6 +263,10 @@ const Parser::Matrix& Parser::codeBehavior() const
         { { ALL, ESCAPE_SINGLE, ANY  }, { SINGLE_QUOTE,  ADD_CHAR     } },
         { { ALL, ESCAPE_DOUBLE, ANY  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
         // 1: probably a mistake if quote reaches end-of-line.
+
+        { { SCRIPT, NORMAL, '/'  },  { REGEXP, ADD_CHAR } },
+        { { SCRIPT, REGEXP, '/'  },  { NORMAL, ADD_CHAR } },
+        { { SCRIPT, REGEXP, '\n'  }, { NORMAL, ADD_CHAR } },
 
         { { ALL, COMMENT_START, '*'  }, { C_COMMENT,     NA                 } },
         { { ALL, COMMENT_START, '/'  }, { SKIP_TO_EOL,   NA                 } },
