@@ -107,6 +107,7 @@ int Options::processFlag(int i, int argc, char* argv[])
         break;
     case 'h':
         printUsageAndExit(SHOW_EXT_FLAGS, EXIT_SUCCESS);
+        break;
     default:
         printUsageAndExit(SHOW_EXT_FLAGS, EXIT_FAILURE);
     }

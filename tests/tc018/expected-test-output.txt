@@ -1,4 +1,4 @@
-./ReactFiberClassComponent.js:992:Duplication 1 (1st instance, 1416 characters, 87 lines).
+./ReactFiberClassComponent.js:992:Duplication 1 (1st instance, 2365 characters, 87 lines).
 ./ReactFiberClassComponent.js:793:Duplication 1 (2nd instance).
         workInProgress,
         workInProgress.updateQueue,
@@ -94,7 +94,7 @@
       // effect even though we're bailing out, so that cWU/cDU are called.
       if (typeof instance.componentDid
 
-./ReactFiberClassComponent.js:747:Duplication 2 (1st instance, 963 characters, 40 lines).
+./ReactFiberClassComponent.js:747:Duplication 2 (1st instance, 1337 characters, 40 lines).
 ./ReactFiberClassComponent.js:945:Duplication 2 (2nd instance).
     workInProgress: Fiber,
     renderExpirationTime: ExpirationTime,
@@ -143,8 +143,40 @@
     if (workInProgress.updateQueue !== null) {
       newState = processUpdateQueue(
 
-./ReactFiberCommitWork.js:318:Duplication 3 (1st instance, 347 characters, 9 lines).
-./ReactFiberCommitWork.js:351:Duplication 3 (2nd instance).
+./cat.js:23:Duplication 3 (1st instance, 371 characters, 10 lines).
+./cat.js:7:Duplication 3 (2nd instance).
+  constructor(props) {
+    super(props);
+    const { kettleData } = props;
+
+    this.state = this.clearState(kettleData.referenceId);
+
+    this.storeTransaction = this.storeTransaction.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.mapStateToTransactionType = this.mapStateToTransactionType.bind(this);
+    this.checkRequiredFields = this.checkRequiredFields.bind(this);
+    props.setTransactionIsDirty(false);
+  }
+
+./ReactFiberClassComponent.js:1155:Duplication 4 (1st instance, 358 characters, 12 lines).
+./ReactFiberClassComponent.js:927:Duplication 4 (2nd instance).
+      // If shouldComponentUpdate returned false, we should still update the
+      // memoized props/state to indicate that this work can be reused.
+      memoizeProps(workInProgress, newProps);
+      memoizeState(workInProgress, newState);
+    }
+
+    // Update the existing instance's state, props, and context pointers even
+    // if shouldComponentUpdate returns false.
+    instance.props = newProps;
+    instance.state = newState;
+    instance.context = newContext;
+
+    return shouldUpdate;
+  }
+
+./ReactFiberCommitWork.js:318:Duplication 5 (1st instance, 347 characters, 9 lines).
+./ReactFiberCommitWork.js:351:Duplication 5 (2nd instance).
         const updateQueue = finishedWork.updateQueue;
         invariant(
           updateQueue !== null && updateQueue.capturedValues !== null,
@@ -154,43 +186,4 @@
         );
         const capturedErrors = updateQueue.capturedValues;
         updateQueue.capturedValues = null;
-
-./ReactFiberClassComponent.js:1085:Duplication 4 (1st instance, 270 characters, 15 lines).
-./ReactFiberClassComponent.js:1139:Duplication 4 (2nd instance).
-        if (
-          oldProps !== current.memoizedProps ||
-          oldState !== current.memoizedState
-        ) {
-          workInProgress.effectTag |= Update;
-        }
-      }
-      if (typeof instance.getSnapshotBeforeUpdate === 'function') {
-        if (
-          oldProps !== current.memoizedProps ||
-          oldState !== current.memoizedState
-        ) {
-          workInProgress.effectTag |= Snapshot;
-        }
-      }
-
-./ReactFiberClassComponent.js:1100:Duplication 5 (1st instance, 197 characters, 16 lines).
-./ReactFiberClassComponent.js:888:Duplication 5 (2nd instance).
-      return false;
-    }
-
-    const shouldUpdate = checkShouldComponentUpdate(
-      workInProgress,
-      oldProps,
-      newProps,
-      oldState,
-      newState,
-      newContext,
-    );
-
-    if (shouldUpdate) {
-      // In order to support react-lifecycles-compat polyfilled components,
-      // Unsafe lifecycles should not be invoked for components using the new APIs.
-      if (
-        !hasNewLifecycles &&
-        (typeof instance.UNSAFE_componentWill
 
