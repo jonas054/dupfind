@@ -1,6 +1,6 @@
 cat.js:23:Duplication 1 (1st instance, 371 characters, 10 lines).
 cat.js:7:Duplication 1 (2nd instance).
 
-cat.js:20:Duplication 2 (1st instance, 65 characters, 3 lines).
+cat.js:20:Duplication 2 (1st instance, 22 characters, 2 lines).
 cat.js:2:Duplication 2 (2nd instance).
 

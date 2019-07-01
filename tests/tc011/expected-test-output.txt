@@ -18,13 +18,12 @@
 ./worst_offenders_formatter.rb:32:Duplication 4 (3rd instance).
 ./offense_count_formatter.rb:27:Duplication 4 (4th instance).
 
-./simple_text_formatter.rb:114:Duplication 5 (1st instance, 12 characters, 1 line).
-./base_formatter.rb:54:Duplication 5 (2nd instance).
-./json_formatter.rb:12:Duplication 5 (3rd instance).
-./base_formatter.rb:61:Duplication 5 (4th instance).
-./worst_offenders_formatter.rb:17:Duplication 5 (5th instance).
-./offense_count_formatter.rb:15:Duplication 5 (6th instance).
-./html_formatter.rb:29:Duplication 5 (7th instance).
-./html_formatter.rb:78:Duplication 5 (8th instance).
-./test_formatter.rb:11:Duplication 5 (9th instance).
+./base_formatter.rb:54:Duplication 5 (1st instance, 12 characters, 1 line).
+./json_formatter.rb:12:Duplication 5 (2nd instance).
+./base_formatter.rb:61:Duplication 5 (3rd instance).
+./worst_offenders_formatter.rb:17:Duplication 5 (4th instance).
+./offense_count_formatter.rb:15:Duplication 5 (5th instance).
+./html_formatter.rb:29:Duplication 5 (6th instance).
+./html_formatter.rb:78:Duplication 5 (7th instance).
+./test_formatter.rb:11:Duplication 5 (8th instance).
 

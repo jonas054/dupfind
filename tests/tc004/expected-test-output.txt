@@ -4,4 +4,4 @@
 ./worst_offenders_formatter.rb:29:Duplication 2 (1st instance, 103 characters, 6 lines).
 ./offense_count_formatter.rb:24:Duplication 2 (2nd instance).
 
-Duplication = 20 lines, 5 %
+Duplication = 20 lines, 6 %

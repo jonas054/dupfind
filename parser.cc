@@ -264,9 +264,10 @@ const Parser::Matrix& Parser::codeBehavior() const
         { { ALL, ESCAPE_DOUBLE, ANY  }, { DOUBLE_QUOTE,  ADD_CHAR     } },
         // 1: probably a mistake if quote reaches end-of-line.
 
-        { { SCRIPT, NORMAL, '/'  },  { REGEXP, ADD_CHAR } },
-        { { SCRIPT, REGEXP, '/'  },  { NORMAL, ADD_CHAR } },
-        { { SCRIPT, REGEXP, '\n'  }, { NORMAL, ADD_CHAR } },
+        { { SCRIPT, NORMAL, '/'  }, { REGEXP,      ADD_CHAR } },
+        { { SCRIPT, REGEXP, '/'  }, { SKIP_TO_EOL, NA       } },
+        { { SCRIPT, REGEXP, '*'  }, { C_COMMENT,   NA       } },
+        { { SCRIPT, REGEXP, '\n' }, { NORMAL,      ADD_CHAR } },
 
         { { ALL, COMMENT_START, '*'  }, { C_COMMENT,     NA                 } },
         { { ALL, COMMENT_START, '/'  }, { SKIP_TO_EOL,   NA                 } },
