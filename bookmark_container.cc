@@ -50,6 +50,7 @@ void BookmarkContainer::clearWithin(const Duplication& d)
     // Remove all cleared bookmarks while maintaining a sorted array.
     std::vector<Bookmark>::iterator newEnd =
         std::remove_if(itsBookmarks.begin(), itsBookmarks.end(),
-                       std::mem_fun_ref(&Bookmark::isCleared));
+                       [](const Bookmark& b) { return b.isCleared(); });
+
     itsBookmarks.resize(newEnd - itsBookmarks.begin());
 }
