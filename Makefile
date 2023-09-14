@@ -1,3 +1,7 @@
+ifeq ($(shell uname -p),arm)
+EXTRA_FLAGS := -arch arm64
+endif
+
 CXX      := g++
 CC       := $(CXX)
 CXXFLAGS := -W -Wall -O2 -g --std=c++11 $(EXTRA_FLAGS)
